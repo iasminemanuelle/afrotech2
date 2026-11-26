@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#07060f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Afrotech">
+  <meta name="description" content="RPG educativo de computação quântica: superposição, emaranhamento e teletransporte em Salvador, 2495.">
+  <title>Afrotech Vol. 2 — Silêncio no Canal Quântico</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <!-- Fontes pixel incluídas em assets/fonts (SIL Open Font License) — funciona offline -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <!-- ===== Palco do jogo (Canvas 384×216 escalado em pixels inteiros) ===== -->
+  <div id="app">
+    <div id="stage">
+      <canvas id="screen" width="384" height="216"></canvas>
+
+      <div id="hud" class="hidden">
+        <!-- Faixa do HUD: fica FORA da cena (acima dela), nunca cobre a sala -->
+        <div id="hud-top">
+          <div class="hud-tl hud-panel" id="hud-status" title="Estabilidade e Créditos Quânticos">
+            <span class="hud-lbl">ESTAB</span>
+            <div class="bar"><div id="hud-stab-fill"></div></div>
+            <span id="hud-stab-text"></span>
+            <span class="hud-cq"><b id="hud-cq" class="gold"></b> CQ</span>
+          </div>
+          <button class="hud-tr hud-panel" id="hud-objbox" type="button" title="Objetivo atual · clique para abrir o Diário">
+            <span class="hud-act"><span id="hud-act"></span><span class="hud-tog" id="hud-tog"></span></span>
+            <span id="hud-obj"></span>
+          </button>
+          <div class="hud-br">
+            <button class="hud-btn" data-act="sheet"><b>F</b> Ficha</button>
+            <button class="hud-btn" data-act="journal"><b>J</b> Diário</button>
+            <button class="hud-btn" id="hud-term" data-act="terminal"><b>Q</b> Terminal</button>
+            <button class="hud-btn" data-act="menu"><b>Esc</b> Menu</button>
+          </div>
+        </div>
+        <div class="hud-bl k">WASD/setas mover · E interagir</div>
+      </div>
+
+      <div id="prompt" class="hidden"></div>
+      <div id="banner" class="hidden"></div>
+    </div>
+  </div>
+
+  <!-- ===== Diálogo ===== -->
+  <div id="dialogue" class="hidden">
+    <div class="dlg-portrait" id="dlg-portrait-box">
+      <canvas id="dlg-portrait" width="16" height="16"></canvas>
+    </div>
+    <div class="dlg-main">
+      <div class="dlg-name" id="dlg-name"></div>
+      <div class="dlg-text" id="dlg-text"></div>
+      <div class="dlg-choices" id="dlg-choices"></div>
+      <div class="dlg-more hidden" id="dlg-more">▼</div>
+    </div>
+  </div>
+
+  <!-- ===== Controles de toque (celular/tablet) ===== -->
+  <div id="touch" class="hidden">
+    <div id="t-dock"></div>
+    <div id="t-mini">
+      <button class="t-btn" data-act="sheet">Ficha</button>
+      <button class="t-btn" data-act="journal">Diário</button>
+      <button class="t-btn" id="t-term" data-act="terminal">Terminal</button>
+      <button class="t-btn" data-act="menu">Menu</button>
+    </div>
+    <div id="t-joy"><div id="t-base"><div id="t-knob"></div></div></div>
+    <button id="t-a" aria-label="Interagir"><span>E</span><small id="t-a-lbl">Agir</small></button>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toasts"></div>
+  <div id="fx-flash"></div>
+  <div id="fx-fade"></div>
+  <div id="fx-decoh" class="hidden"><div class="decoh-box"><div class="decoh-title">DECOERÊNCIA</div><div>Ruído quântico excessivo. O Oráculo está reestabilizando sua assinatura…</div></div></div>
+  <div id="scanlines"></div>
+
+  <!-- ===== Tela de título ===== -->
+  <div id="screen-title" class="screen hidden">
+    <div class="title-wrap">
+      <div class="title-kicker">RPG EDUCATIVO · COMPUTAÇÃO QUÂNTICA</div>
+      <h1 class="title-logo">AFROTECH</h1>
+      <div class="title-vol">VOLUME 2</div>
+      <div class="title-sub">SILÊNCIO NO CANAL QUÂNTICO</div>
+      <div class="title-place">Salvador · 2495</div>
+      <div class="title-menu">
+        <button class="btn primary" id="btn-new">Novo jogo</button>
+        <button class="btn" id="btn-continue">Continuar</button>
+        <button class="btn" id="btn-help">Como jogar</button>
+        <button class="btn" id="btn-about">Sobre</button>
+        <button class="btn" id="btn-teacher">Modo professor(a)</button>
+      </div>
+      <div class="title-foot"><span class="k">Enter para começar · M liga/desliga o som</span><span class="t-only">Funciona em pé ou deitado · o progresso fica salvo neste aparelho</span></div>
+    </div>
+  </div>
+
+  <!-- ===== Criação de ficha ===== -->
+  <div id="screen-create" class="screen hidden">
+    <div class="create px-panel">
+      <div class="create-head">
+        <h2>FICHA DO AGENTE</h2>
+        <div>Convocação Afrotech · distribua seus <b class="gold">Créditos Quânticos</b> entre os atributos</div>
+      </div>
+      <div class="create-grid">
+        <section class="c-col c-id">
+          <h3>Identidade</h3>
+          <div class="c-preview-box"><canvas id="c-preview" width="16" height="22"></canvas></div>
+          <label class="c-label" for="c-name">Nome</label>
+          <div class="c-name-row"><input id="c-name" maxlength="16" autocomplete="off"><button class="btn btn-sm" id="c-random" title="Sortear nome">Sortear</button></div>
+          <div class="c-label">Pele</div><div class="swatches" id="c-skins"></div>
+          <div class="c-label">Cabelo</div><div class="opts" id="c-hairs"></div>
+          <div class="c-label">Neon</div><div class="swatches" id="c-accents"></div>
+        </section>
+        <section class="c-col c-class">
+          <h3>Especialidade</h3>
+          <div id="c-classes"></div>
+        </section>
+        <section class="c-col c-attrs">
+          <h3>Atributos <span class="credits">Créditos: <b id="c-credits">60</b> / 60</span></h3>
+          <div id="c-attrs"></div>
+          <div class="btn-row">
+            <button class="btn btn-sm" id="c-preset">Distribuição recomendada</button>
+            <button class="btn btn-sm" id="c-reset">Zerar</button>
+          </div>
+          <div class="c-note">Cada nível custa o valor do atributo (máx. 3). Nos testes: <b>2d6 + nível + bônus de classe (★) ≥ 7</b>. Créditos que sobrarem viram reserva para usar no Terminal Oráculo.</div>
+        </section>
+      </div>
+      <div class="create-foot">
+        <button class="btn" id="c-back">Voltar</button>
+        <div class="c-summary" id="c-summary"></div>
+        <button class="btn primary" id="c-start">Iniciar missão</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scripts (ordem importa; sem módulos ES para rodar direto via file://) ===== -->
+  <script src="js/core/config.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/core/input.js"></script>
+  <script src="js/core/audio.js"></script>
+  <script src="js/core/music.js"></script>
+  <script src="js/gfx/pixel.js"></script>
+  <script src="js/gfx/characters.js"></script>
+  <script src="js/gfx/tiles.js"></script>
+  <script src="js/gfx/art.js"></script>
+  <script src="js/ui/ui.js"></script>
+  <script src="js/content/glossary.js"></script>
+  <script src="js/content/quiz.js"></script>
+  <script src="js/content/dialogues.js"></script>
+  <script src="js/quantum/qsim.js"></script>
+  <script src="js/quantum/bloch.js"></script>
+  <script src="js/systems/dice.js"></script>
+  <script src="js/systems/dialogue.js"></script>
+  <script src="js/world/maps.js"></script>
+  <script src="js/world/world.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/panel.js"></script>
+  <script src="js/ui/quiz.js"></script>
+  <script src="js/ui/lousa.js"></script>
+  <script src="js/ui/simulator.js"></script>
+  <script src="js/ui/minigames.js"></script>
+  <script src="js/ui/report.js"></script>
+  <script src="js/ui/create.js"></script>
+  <script src="js/ui/touch.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
