@@ -59,6 +59,17 @@
     return bit;
   };
 
+  /* vetor de Bloch do estado reduzido de um qubit do registro (encolhe quando ele está emaranhado) */
+  function reduced(reg, q) {
+    var s = reg.step(q), r00 = 0, r11 = 0, re = 0, im = 0;
+    for (var i = 0; i < reg.v.length; i++) {
+      if (i & s) continue;
+      var a = reg.v[i], b = reg.v[i | s], ab = mul(conj(a), b);
+      r00 += abs2(a); r11 += abs2(b); re += ab.re; im += ab.im;
+    }
+    return { x: 2 * re, y: 2 * im, z: r00 - r11 };
+  }
+
   function bloch(st) {
     var ab = mul(conj(st[0]), st[1]);
     return { x: 2 * ab.re, y: 2 * ab.im, z: abs2(st[0]) - abs2(st[1]) };
@@ -116,7 +127,7 @@
 
   AF.Q = {
     C: C, GATES: GATES, Register: Register,
-    bloch: bloch, randomState: randomState, apply2: apply2, fidelity: fidelity, teleport: teleport,
+    bloch: bloch, reduced: reduced, randomState: randomState, apply2: apply2, fidelity: fidelity, teleport: teleport,
     fmt: fmt, fmtState: fmtState,
     /* sequência de portas para cada escolha do jogador (ordem de aplicação) */
     SEQ: { none: [], X: ['X'], Z: ['Z'], XZ: ['X', 'Z'] },

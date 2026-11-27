@@ -281,16 +281,22 @@ Com Estabilidade 0 ocorre **decoerência**: o Oráculo reestabiliza o(a) agente 
 
 ## 5. O simulador (física de verdade, formato do Apêndice 1)
 
-`js/quantum/qsim.js` simula um **vetor de estado de 3 qubits** com amplitudes complexas:
+`js/quantum/qsim.js` simula um **vetor de estado de 3 qubits** com amplitudes complexas. Desde a v0.8.1,
+**cada etapa do roteiro é uma ação do(a) jogador(a)** (botões "Sua ação", teclas 1 e 2 ou E), e não mais uma animação:
 
-1. Dandara recebe um estado desconhecido `|ψ⟩ = α|0⟩ + β|1⟩` em q0.
-2. Par `|β₀₀⟩ = (|00⟩ + |11⟩)/√2` entre q1 (Salvador) e q2 (Jacobina).
-3. `CNOT(q0→q1)` e `H(q0)`.
-4. Medição de q0 e q1 pela regra de Born → bits `b₁b₂` (25% cada). A seta de Dandara **some**: não-clonagem.
-5. Os bits viajam pela fibra; no **treino**, Jamal vê a **seta vermelha** (onde o q2 está) e a **sombra verde**
-   (onde deveria estar) e usa **X** e **Z** livremente até alinhar, depois clica em **Verificar** — como no roteiro.
-6. A **fidelidade** `|⟨ψ|φ⟩|²` é calculada; as portas aparecem como rotações na **esfera de Bloch**.
-7. Na **validação ao vivo** (Núcleo), não há seta nem sombra — como na vida real: só os bits e a regra.
+1. **Carregar |ψ⟩ em q0** — Dandara recebe um estado desconhecido `|ψ⟩ = α|0⟩ + β|1⟩`.
+2. **H em q1** e depois **CNOT q1 → q2** — cria o par `|β₀₀⟩ = (|00⟩ + |11⟩)/√2` entre Salvador e Jacobina.
+3. **CNOT q0 → q1** e depois **H em q0** — a operação local de Dandara.
+   Nas etapas 2 e 3 a ordem importa: na ordem errada, o simulador avisa e explica por quê.
+4. **Medir q0** e **medir q1** — cada um dá 0 ou 1 pela regra de Born, formando os bits `b₁b₂` (25% cada par).
+5. **Enviar b₁b₂ pela fibra** — no **treino**, Jamal vê a **seta vermelha** (onde o q2 está) e a **sombra verde**
+   (onde deveria estar) e usa **X** e **Z** livremente até alinhar; depois clica em **Verificar** — como no roteiro.
+
+As esferas de Bloch mostram o **estado reduzido** de q0 (Dandara) e de q2 (Jamal) a cada ação: a seta **encolhe**
+quando o qubit se emaranha (q2 vai para o centro depois da CNOT q1 → q2) e cai num polo quando a medição o define.
+A **fidelidade** `|⟨ψ|φ⟩|²` é calculada; as portas aparecem como rotações na esfera. "Repetir rodada" refaz o mesmo
+|ψ⟩ com os mesmos bits. Na **validação ao vivo** (Núcleo), não há seta nem sombra — como na vida real: só os bits e a
+regra — e o relógio só corre na hora de corrigir.
 
 | Bits b₁b₂ | Estado de Jamal (Tabela 1 da dissertação) | Correção |
 |---|---|---|

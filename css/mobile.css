@@ -187,7 +187,9 @@ body.touch .sim { display: flex; flex-direction: column; gap: 8px; }
 body.touch .sim-bottom { display: contents; }
 body.touch .sim-head { order: 0; gap: 6px 10px; margin: 0; }
 body.touch .sim-stations { order: 1; gap: 6px; }
-body.touch .sim-narr { order: 2; font-size: 19px; min-height: 0; padding: 6px 10px; }
+body.touch .sim-left { order: 2; }
+body.touch .sim-narr { font-size: 19px; min-height: 0; padding: 6px 10px; }
+body.touch .sim-ops .op { flex: 1 1 46%; font-size: 18px; min-height: 42px; }
 body.touch .sim-foot { order: 3; flex-wrap: wrap; margin: 0; }
 body.touch .sim-side { order: 4; }
 body.touch .sim > .circ-wrap { order: 5; }
