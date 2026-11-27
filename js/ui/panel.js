@@ -64,7 +64,7 @@
       var box = AF.el('div', 'sheet');
       var id = AF.el('div', 'sheet-id');
       var cv = AF.el('canvas', 'sheet-portrait'); cv.width = 16; cv.height = 22;
-      cv.getContext('2d').drawImage(AF.World.playerFrames ? AF.World.playerFrames.down[0] : AF.Chars.build(AF.Chars.playerSpec(d.look)).down[0], 0, 0);
+      cv.getContext('2d').drawImage(AF.World.playerFrames ? AF.World.playerFrames.down[0] : AF.Chars.build(S.spec()).down[0], 0, 0);
       id.appendChild(cv);
       var max = S.maxStability();
       id.insertAdjacentHTML('beforeend',
@@ -114,6 +114,7 @@
       var o = AF.Game.objective();
       var steps = [
         ['<b>Problematização ·</b> tem ou não tem pimenta? O acarajé de Schrödinger (Dona Cici)', S.flag('acarajeQ')],
+        ['<b>Problematização ·</b> portas lógicas no Elevador Lacerda: clássicas e quânticas (' + Math.min(5, S.count('elevSolved')) + '/5)', S.flag('miniElevador')],
         ['<b>Problematização ·</b> passar pelo bloqueio de emergência da Torre', S.flag('gateOpen')],
         ['<b>Problematização ·</b> conectar-se à interface do Núcleo (antecâmara da sala blindada)', S.flag('nucleoLogs')],
         ['<b>Problematização ·</b> registrar hipóteses na lousa de Dandara', S.flag('lousaRead')],
@@ -131,10 +132,16 @@
         ['Explicar o teletransporte para Dona Cici', S.flag('ciciApp')],
         ['Explicar o teletransporte para Kauã (2 dúvidas)', S.flag('kauaApp2')],
         ['Conversar com o Prof. Hohenfeld na Prainha da Baía (desça a Rampa do Mercado)', S.flag('hohenfeldQuote')],
-        ['<b>Pós-missão ·</b> Elevador de Hadamard (' + Math.min(5, S.count('elevSolved')) + '/5)' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('miniElevador')],
+        ['Jogo da Memória Quântico com Kauã', S.flag('memoria')],
+        ['Comprar roupa ou acessório na Boutique do Mercado (Dona Lu)', S.flag('loja')],
+        ['Ouvir 4 histórias da mecânica quântica (Prof. Hohenfeld)', S.flag('hohenfeldHist')],
+        ['Ouvir 4 histórias de mulheres na ciência (Prof. Hohenfeld)', S.flag('mulheresCiencia')],
+        ['Aula de natação com Mi Ayô: as três boias', S.flag('natacao')],
         ['<b>Pós-missão ·</b> Gincana das Fitinhas no Mercado Modelo' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('miniMercado')],
         ['<b>Pós-missão ·</b> contar a aventura ao Prof. Hohenfeld' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('hohenfeldStory')],
-        ['<b>Pós-missão ·</b> Recepção em Jacobina, na estação de Jamal (Hipertrem)' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('jacobinaDone')]
+        ['<b>Pós-missão ·</b> Recepção em Jacobina, na estação de Jamal (Hipertrem)' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('jacobinaDone')],
+        ['<b>Pós-missão ·</b> mirante do Alto do Cruzeiro, em Jacobina (20 CQ)' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('cruzeiroVista')],
+        ['<b>Pós-missão ·</b> VLT da Baía até a Ribeira e descansar em casa' + (S.flag('restored') ? '' : ' <span class="dim">(após a missão)</span>'), S.flag('casa')]
       ];
       var html = '<div class="journal"><div class="j-obj"><div class="j-act">' + o.act + '</div><div>' + AF.esc(o.text) + '</div></div>';
       html += '<div class="j-cols"><div><h3>Missão principal</h3><ul class="checklist">' +
@@ -242,7 +249,10 @@
         '<li>O Terminal Oráculo restaura Estabilidade e permite investir Créditos Quânticos em atributos.</li>' +
         '<li>A missão segue os Três Momentos Pedagógicos: <b>Problematização</b> (suas hipóteses), <b>Organização do Conhecimento</b> (Prof.ª Iasmin e simulador) e <b>Aplicação</b> (circuito, validação e relatório no Núcleo).</li>' +
         '<li>O Terminal Oráculo responde perguntas de física quântica — só dentro do tema!</li>' +
-        '<li><b>Minigames:</b> no começo, o acarajé de Dona Cici (tem ou não tem pimenta?). Depois da missão, o Elevador de Hadamard (Elevador Lacerda) e a Gincana das Fitinhas (Mercado Modelo). Desça a Rampa do Mercado para chegar à Prainha da Baía e conversar com o Prof. Hohenfeld. Depois da missão, o Hipertrem (leste da praça) leva à estação de Jamal em Jacobina.</li>' +
+        '<li><b>Antes da Torre:</b> o acarajé de Dona Cici (tem ou não tem pimenta?) e o treinamento de portas lógicas no Elevador Lacerda: primeiro NOT, AND, OR e XOR, depois as portas quânticas X, H e Z. Sem a credencial, o drone K-7 não libera o portão.</li>' +
+        '<li><b>A qualquer hora:</b> o Jogo da Memória Quântico com Kauã, a Boutique da Dona Lu (em frente ao Mercado Modelo) para comprar roupas e acessórios com Créditos Quânticos, e a Prainha da Baía (Rampa do Mercado), com as histórias do Prof. Hohenfeld e a aula de natação de Mi Ayô.</li>' +
+        '<li><b>No Núcleo:</b> entre as etapas do protocolo (circuito → validação → relatório), os qubits recalibram por 1min30s. Dá para explorar enquanto isso.</li>' +
+        '<li><b>Depois da missão:</b> a Gincana das Fitinhas (Mercado Modelo), o VLT da Baía até sua casa na Ribeira (1 minuto de viagem pela beira da baía) e o Hipertrem até Jacobina, com o mirante do Alto do Cruzeiro (20 CQ).</li>' +
         '<li><b>Trilha sonora baiana:</b> cada lugar tem o seu ritmo, com melodias originais — ijexá dos afoxés (título), samba-reggae dos blocos afro (praça), canção praieira (Prainha), toque de Angola da capoeira com berimbau (torre), samba de roda do Recôncavo (minigames), baião do sertão (Jacobina) e axé de trio elétrico (vitória). Ligue, desligue ou mude o volume no Menu.</li>' +
         '<li><b>Para a professora:</b> no Menu, "Relatório para a professora" gera um código com o seu progresso para enviar.</li>' +
         '</ul></div>';

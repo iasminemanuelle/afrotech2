@@ -256,8 +256,8 @@
           S.setFlag('circuitBuilt');
           S.addJournal('Circuito reconstruído', 'Montei o circuito de 3 qubits: H e CNOT criam o par |β₀₀⟩ (q1, q2); Dandara aplica CNOT(q0→q1) e H(q0), mede q0 e q1, envia b₁b₂ pela fibra; Jamal aplica X^b₂ e Z^b₁.');
           box.innerHTML = '<div class="circ-wrap"><canvas class="quiz-circ" width="980" height="215"></canvas></div><div class="quiz-end"><div class="quiz-end-title">CIRCUITO RECONSTRUÍDO</div>' +
-            '<p>"Arquitetura validada. Agora, a prova de fogo: cinco teletransportes perfeitos seguidos, sem ver a seta — como na vida real." — Oráculo</p>' +
-            '<div class="btn-row"><button class="btn primary quiz-close2">Iniciar validação ao vivo</button></div></div>';
+            '<p>"Arquitetura validada. Antes da prova de fogo — cinco teletransportes perfeitos seguidos, sem ver a seta —, o Núcleo precisa recalibrar os qubits: ' + AF.NucleoWait.fmt(AF.CONFIG.NUCLEO_WAIT) + ' de espera." — Oráculo</p>' +
+            '<div class="btn-row"><button class="btn primary quiz-close2">Recalibrar o Núcleo</button></div></div>';
           AF.CircuitArt.draw(box.querySelector('.quiz-circ'), 8, 0);
           box.querySelector('.quiz-close2').addEventListener('click', function () { m.close(true); if (onDone) onDone(); });
         }

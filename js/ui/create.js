@@ -42,12 +42,80 @@
       $('c-reset').addEventListener('click', function () { AF.ATTRS.forEach(function (a) { CR.st.attrs[a.id] = 0; }); CR.render(); });
       $('c-random').addEventListener('click', function () { $('c-name').value = NAMES[Math.floor(Math.random() * NAMES.length)]; });
       $('c-name').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+      $('c-look-rand').addEventListener('click', function () { CR.randomLook(); });
+    },
+
+    /* Abas da aparência: cada grupo é uma lista de AF.LOOKS */
+    LOOK_TABS: [
+      { id: 'corpo', name: 'Corpo', groups: [
+        { label: 'Pele', key: 'skin', list: 'skins', kind: 'swatch', color: 'base' },
+        { label: 'Porte', key: 'body', list: 'bodies', kind: 'opt' },
+        { label: 'Marcas na pele', key: 'marks', list: 'marks', kind: 'opt' },
+        { label: 'Acessibilidade e próteses', key: 'extras', list: 'extras', kind: 'multi' }
+      ] },
+      { id: 'cabelo', name: 'Cabelo e rosto', groups: [
+        { label: 'Cabelo', key: 'hair', list: 'hairs', kind: 'opt' },
+        { label: 'Cor do cabelo', key: 'hairColor', list: 'hairColors', kind: 'swatch', color: 'l' },
+        { label: 'Barba', key: 'beard', list: 'beards', kind: 'opt' },
+        { label: 'Óculos', key: 'glasses', list: 'glasses', kind: 'opt' }
+      ] },
+      { id: 'roupa', name: 'Roupa', groups: [
+        { label: 'Roupa', key: 'outfit', list: 'outfits', kind: 'opt' },
+        { label: 'Cor da roupa', key: 'top', list: 'tops', kind: 'swatch', color: 'c' },
+        { label: 'Calça', key: 'pants', list: 'pants', kind: 'swatch', color: 'c' },
+        { label: 'Neon', key: 'accent', list: 'accents', kind: 'swatch', color: 'color' }
+      ] }
+    ],
+    lookTab: 'corpo',
+
+    randomLook: function () {
+      var L = AF.LOOKS, lk = this.st.look;
+      function any(list) { return list[Math.floor(Math.random() * list.length)].id; }
+      lk.skin = any(L.skins); lk.hair = any(L.hairs); lk.accent = any(L.accents);
+      lk.hairColor = Math.random() < 0.6 ? 'preto' : any(L.hairColors);
+      lk.beard = Math.random() < 0.7 ? 'nenhuma' : any(L.beards);
+      lk.glasses = Math.random() < 0.7 ? 'nenhum' : any(L.glasses);
+      lk.marks = Math.random() < 0.8 ? 'nenhuma' : any(L.marks);
+      lk.body = any(L.bodies); lk.outfit = any(L.outfits); lk.top = any(L.tops); lk.pants = any(L.pants);
+      lk.extras = Math.random() < 0.2 ? [any(L.extras)] : [];
+      this.render();
+    },
+
+    renderLook: function () {
+      var st = this.st, self = this, L = AF.LOOKS;
+      var tabs = $('c-look-tabs'); tabs.innerHTML = '';
+      this.LOOK_TABS.forEach(function (t) {
+        var b = AF.el('button', t.id === self.lookTab ? 'on' : '', t.name);
+        b.addEventListener('click', function () { self.lookTab = t.id; self.renderLook(); });
+        tabs.appendChild(b);
+      });
+      var box = $('c-look'); box.innerHTML = '';
+      var tab = this.LOOK_TABS.filter(function (t) { return t.id === self.lookTab; })[0];
+      tab.groups.forEach(function (gr) {
+        box.appendChild(AF.el('div', 'c-label', gr.label));
+        var wrap = AF.el('div', gr.kind === 'swatch' ? 'swatches' : 'opts');
+        L[gr.list].forEach(function (it) {
+          var on = gr.kind === 'multi' ? (st.look.extras || []).indexOf(it.id) >= 0 : st.look[gr.key] === it.id;
+          var b = gr.kind === 'swatch' ? AF.el('button', 'swatch' + (on ? ' on' : '')) : AF.el('button', 'opt' + (gr.kind === 'multi' ? ' multi' : '') + (on ? ' on' : ''), it.name);
+          if (gr.kind === 'swatch') { b.style.background = it[gr.color]; b.title = it.name; b.setAttribute('aria-label', it.name); }
+          b.addEventListener('click', function () {
+            if (gr.kind === 'multi') {
+              var ex = (st.look.extras || []).slice(), i = ex.indexOf(it.id);
+              if (i >= 0) ex.splice(i, 1); else ex.push(it.id);
+              st.look.extras = ex;
+            } else st.look[gr.key] = it.id;
+            self.renderLook(); self.drawPreview('down', 0);
+          });
+          wrap.appendChild(b);
+        });
+        box.appendChild(wrap);
+      });
     },
 
     show: function () {
       this.st = {
         classId: 'cientista',
-        look: { skin: 's1', hair: 'afro', accent: 'ciano' },
+        look: Object.assign({}, AF.LOOK_DEFAULT, { extras: [] }),
         attrs: {}
       };
       $('c-name').value = NAMES[Math.floor(Math.random() * NAMES.length)];
@@ -90,26 +158,7 @@
     render: function () {
       var st = this.st, self = this;
       /* aparência */
-      var sk = $('c-skins'); sk.innerHTML = '';
-      AF.LOOKS.skins.forEach(function (s) {
-        var b = AF.el('button', 'swatch' + (st.look.skin === s.id ? ' on' : ''));
-        b.style.background = s.base; b.title = s.name;
-        b.addEventListener('click', function () { st.look.skin = s.id; self.render(); });
-        sk.appendChild(b);
-      });
-      var hr = $('c-hairs'); hr.innerHTML = '';
-      AF.LOOKS.hairs.forEach(function (h) {
-        var b = AF.el('button', 'opt' + (st.look.hair === h.id ? ' on' : ''), h.name);
-        b.addEventListener('click', function () { st.look.hair = h.id; self.render(); });
-        hr.appendChild(b);
-      });
-      var ac = $('c-accents'); ac.innerHTML = '';
-      AF.LOOKS.accents.forEach(function (a) {
-        var b = AF.el('button', 'swatch' + (st.look.accent === a.id ? ' on' : ''));
-        b.style.background = a.color; b.title = a.name;
-        b.addEventListener('click', function () { st.look.accent = a.id; self.render(); });
-        ac.appendChild(b);
-      });
+      this.renderLook();
       this.drawPreview('down', 0);
 
       /* classes */
@@ -153,7 +202,7 @@
       var name = ($('c-name').value || '').trim().slice(0, 16) || 'Agente';
       var st = this.st;
       AF.State.newGame({
-        name: name, classId: st.classId, look: Object.assign({}, st.look), attrs: Object.assign({}, st.attrs),
+        name: name, classId: st.classId, look: JSON.parse(JSON.stringify(st.look)), attrs: Object.assign({}, st.attrs),
         credits: this.remaining() + 3 * (st.attrs.investimento || 0) + (AF.CLASS_BY_ID[st.classId].bonusCredits || 0)
       });
       this.hide();

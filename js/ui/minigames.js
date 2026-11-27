@@ -4,9 +4,11 @@
  *   AF.Mini.acaraje   · Início da missão (tabuleiro de Dona Cici)
  *       "Tem ou não tem pimenta?" — o acarajé de Schrödinger:
  *       superposição, medição/colapso, regra de Born e os limites da analogia
- *   AF.Mini.elevador  · Pós-missão (Elevador Lacerda)
- *       "Elevador de Hadamard" — |0⟩ Cidade Baixa, |1⟩ Cidade Alta:
+ *   AF.Mini.elevador  · Antes da Torre (Elevador Lacerda)
+ *       Parte 1: portas lógicas clássicas (NOT, AND, OR, XOR) no elevador antigo
+ *       Parte 2: "Elevador de Hadamard" — |0⟩ Cidade Baixa, |1⟩ Cidade Alta:
  *       portas X, H e Z, interferência e fase (as correções de Jamal)
+ *   AF.Mini.memoria   · Jogo da Memória Quântico (Kauã)
  *   AF.Mini.mercado   · Pós-missão (Mercado Modelo)
  *       "Gincana das Fitinhas" — o desafio de Bell (jogo CHSH):
  *       correlação clássica ≤ 75%, emaranhamento ≈ 85%, sem mensagem
@@ -354,13 +356,13 @@
           'Crônica: perdi duas apostas e ganhei um acarajé quente. Dona Cici disse que a física dela é de tabuleiro, mas é física de verdade.');
       }
       frame('<div class="mg-grid">' + scene('Quentinho — e já medido!') + '<div class="mg-side">' +
-        say('cici', 'Agora sim, meu bem! Tome um acarajé quente — esse eu abri antes de você chegar, então já está decidido. Vai lá na Torre que a cidade precisa de você.') +
+        say('cici', 'Agora sim, meu bem! Tome um acarajé quente — esse eu abri antes de você chegar, então já está decidido. ' + (S.flag('miniElevador') ? 'Vai lá na Torre que a cidade precisa de você.' : 'Agora passa no Elevador Lacerda, que o Oráculo quer te ensinar as portas lógicas antes da Torre.') + '') +
         '<ul class="mg-take"><li><b>Superposição:</b> antes de medir, as duas possibilidades juntas, cada uma com uma amplitude.</li>' +
         '<li><b>Medição:</b> aparece um resultado só; abrir de novo confirma o mesmo.</li>' +
         '<li><b>Regra de Born:</b> chance = amplitude² (0,5 → 25%).</li>' +
         '<li><b>Gato de Schrödinger:</b> objetos do dia a dia perdem a superposição na hora (decoerência). O acarajé quântico é só analogia: o de verdade já vem quente ou frio.</li></ul>' +
         (replay ? '<p class="dim">Partida livre: sem novas recompensas.</p>' : '<p class="gold">+6 Créditos Quânticos · +10 Estabilidade · 5 conceitos no Glossário</p>') +
-        '<div class="mg-btns"><button class="btn primary mg-go">' + (S.flag('gateOpen') ? 'Voltar à praça' : 'Seguir para a Torre') + '<span class="k"> [E]</span></button></div></div></div>');
+        '<div class="mg-btns"><button class="btn primary mg-go">' + (S.flag('gateOpen') ? 'Voltar à praça' : (S.flag('miniElevador') ? 'Seguir para a Torre' : 'Seguir para o Elevador Lacerda')) + '<span class="k"> [E]</span></button></div></div></div>');
       var go = function () { g.m.close(); if (onDone) onDone(); AF.HUD.refresh(); };
       q(body, '.mg-go').addEventListener('click', go); ctl.interact = go; ctl.digit = null;
     }
@@ -386,7 +388,7 @@
       text: 'Leve todos à <b>Cidade Alta</b> usando só <b>H</b> e <b>Z</b>. Dica de ascensorista: Z sozinha não muda as chances… mas muda um sinal.',
       done: '<b>H · Z · H</b> funciona como X. A porta Z só troca o <b>sinal</b> da amplitude de |1⟩: invisível numa medição direta, decisiva quando outra H faz as amplitudes interferirem. Por isso a correção Z de Jamal importa tanto.' },
     { title: 'Chegou de Jacobina', start: [S2, -S2], target: 0, allowed: ['H', 'Z'], max: 2,
-      text: 'Uma cabine chegou pelo canal no estado <b>(|0⟩ − |1⟩)/√2</b>: 50/50, mas com sinal de menos. Use H e Z para entregar <b>todos na Cidade Baixa</b>.',
+      text: 'Uma cabine chegou no estado <b>(|0⟩ − |1⟩)/√2</b>: 50/50, mas com sinal de menos. Use H e Z para entregar <b>todos na Cidade Baixa</b>.',
       done: '<b>Z</b> tirou o sinal de menos e <b>H</b> desfez a superposição: Z · H leva (|0⟩ − |1⟩)/√2 para |0⟩. Corrigir a fase antes de medir é exatamente o trabalho de Jamal no teletransporte.' }
   ];
   function applyGate(a, gt) {
@@ -438,8 +440,89 @@
     x.fillStyle = '#fff'; x.beginPath(); x.arc(px, py, 5, 0, Math.PI * 2); x.fill();
   }
 
+  /* Parte 1 · portas lógicas clássicas: o painel de manutenção do elevador antigo */
+  var CL_PUZ = [
+    { title: 'NOT', inputs: 1, want: 'NOT', gates: ['IGUAL', 'NOT'],
+      text: 'A lâmpada <b>"cabine fora"</b> deve acender (1) quando a cabine <b>NÃO</b> está na estação (A = 0). Que porta liga A à lâmpada?',
+      done: 'A porta <b>NOT</b> (inversor) troca 0 por 1 e 1 por 0. Guarde isso: a porta quântica <b>X</b> é o NOT dos qubits.' },
+    { title: 'AND', inputs: 2, want: 'AND', gates: ['AND', 'OR', 'XOR'],
+      text: 'Trava de segurança: a cabine só parte se a porta estiver fechada (<b>A = 1</b>) <b>E</b> o ascensorista apertar o botão (<b>B = 1</b>).',
+      done: 'A porta <b>AND</b> (E) só dá 1 quando <b>as duas</b> entradas são 1. É assim que os circuitos clássicos fazem regras de segurança.' },
+    { title: 'OR', inputs: 2, want: 'OR', gates: ['AND', 'OR', 'XOR'],
+      text: 'Chamada: a cabine vem se alguém chamar da Cidade Alta (<b>A</b>) <b>OU</b> da Cidade Baixa (<b>B</b>) — ou dos dois lugares.',
+      done: 'A porta <b>OR</b> (OU) dá 1 quando <b>pelo menos uma</b> entrada é 1.' },
+    { title: 'XOR', inputs: 2, want: 'XOR', gates: ['AND', 'OR', 'XOR'],
+      text: 'Interruptor de escada: há um interruptor em cada estação para a mesma luz. Mexer em <b>qualquer um</b> troca a luz; com os dois desligados, ela fica apagada.',
+      done: 'A porta <b>XOR</b> (OU exclusivo) dá 1 quando as entradas são <b>diferentes</b>. A porta quântica <b>CNOT</b> faz exatamente isso com o segundo qubit — é ela que emaranha o par do teletransporte.' }
+  ];
+  function logic(gt, a, b) {
+    if (gt === 'NOT') return a ? 0 : 1;
+    if (gt === 'IGUAL') return a;
+    if (gt === 'AND') return a & b;
+    if (gt === 'OR') return a | b;
+    return a ^ b;
+  }
+
   function elevador() {
-    var g = open('Elevador de Hadamard · Elevador Lacerda', 'mg-el', function () { if (g.raf) cancelAnimationFrame(g.raf); });
+    var g = open('Elevador Lacerda · Portas lógicas', 'mg-el', function () { if (g.raf) cancelAnimationFrame(g.raf); });
+    var body = g.body, ctl = g.ctl;
+    if (!S.flag('portasClassicas')) { classical(); return g.m; }
+    return quantumPart(g);
+
+    function classical() {
+      var ci = Math.min(S.count('elevClassic'), CL_PUZ.length - 1), tries = 0;
+      function rows(P) { return P.inputs === 1 ? [[0], [1]] : [[0, 0], [0, 1], [1, 0], [1, 1]]; }
+      function draw(pick) {
+        var P = CL_PUZ[ci];
+        var head = '<div class="mg-steps"><span class="on">1 · Portas lógicas clássicas</span><span>2 · Elevador de Hadamard (quântico)</span></div>' +
+          '<div class="mg-chips">' + CL_PUZ.map(function (p, i) { return '<span class="mg-chip ' + (i < ci ? 'done' : (i === ci ? 'on' : 'lock')) + '">' + (i + 1) + '. ' + p.title + '</span>'; }).join('') + '</div>';
+        var tab = '<table class="logic-tab"><tr>' + (P.inputs === 1 ? '<th>A</th>' : '<th>A</th><th>B</th>') + '<th>Desejado</th><th>Sua porta</th></tr>' +
+          rows(P).map(function (rw) {
+            var want = logic(P.want, rw[0], rw[1]), got = pick ? logic(pick, rw[0], rw[1]) : null;
+            return '<tr><td>' + rw.join('</td><td>') + '</td><td>' + want + '</td><td class="' + (got === null ? '' : (got === want ? 'ok' : 'bad')) + '">' + (got === null ? '·' : got + (got === want ? ' ✓' : ' ✗')) + '</td></tr>';
+          }).join('') + '</table>';
+        body.innerHTML = head + say('oraculo', ci === 0 && !pick ? 'Antes de entrar na Torre, todo(a) agente tira a <b>Credencial de Operador(a) de Portas</b> aqui no Elevador Lacerda. Primeiro, o elevador antigo: bits que são <b>0 ou 1</b>, nunca os dois.' : P.text) +
+          (ci === 0 && !pick ? '<div class="mg-order">' + P.text + '</div>' : '') + tab +
+          '<div class="mg-btns">' + P.gates.map(function (gt, i) { return '<button class="btn mg-gate" data-g="' + gt + '"><span class="num">' + (i + 1) + '</span>' + gt + '</button>'; }).join('') + '</div><div class="mg-out"></div>';
+        faces(body);
+        body.querySelectorAll('.mg-gate').forEach(function (b) { b.addEventListener('click', function () { choose(b.getAttribute('data-g')); }); });
+        ctl.digit = function (n) { var gt = P.gates[n - 1]; if (gt) choose(gt); };
+        ctl.interact = null;
+      }
+      function choose(gt) {
+        var P = CL_PUZ[ci]; tries++;
+        draw(gt);
+        var out = q(body, '.mg-out');
+        if (gt === P.want) {
+          AF.Audio.play('success');
+          var o = {}; o['c' + (ci + 1)] = tries; S.mg('elevador', o);
+          if (ci >= S.count('elevClassic')) { S.d.counters.elevClassic = ci + 1; S.addCredits(1, true); }
+          out.innerHTML = '<div class="quiz-fb ok"><b>Painel certo!</b> ' + P.done + '</div><div class="mg-btns"><button class="btn primary mg-go">' + (ci < CL_PUZ.length - 1 ? 'Próximo painel' : 'Ir para a Parte 2') + '<span class="k"> [E]</span></button></div>';
+          var go = function () {
+            tries = 0;
+            if (ci < CL_PUZ.length - 1) { ci++; draw(null); return; }
+            S.setFlag('portasClassicas'); S.unlock('portas_logicas');
+            S.addJournal('Portas lógicas clássicas', 'No painel antigo do Elevador Lacerda: NOT inverte o bit; AND só dá 1 com as duas entradas em 1; OR dá 1 com pelo menos uma; XOR dá 1 quando as entradas são diferentes. Bits clássicos são 0 OU 1. Agora a cabine vira um qubit.');
+            body.innerHTML = '<div class="mg-end"><div class="quiz-end-title">PARTE 1 CONCLUÍDA · PORTAS CLÁSSICAS</div>' +
+              say('iasmin', 'Portas clássicas mexem em bits que são <b>0 ou 1</b>. Agora a cabine vai virar um <b>qubit</b>: as portas quânticas mexem em <b>amplitudes</b>. A <b>X</b> é o NOT quântico, a <b>CNOT</b> faz o XOR no segundo qubit… e a <b>H</b> não tem parceira clássica nenhuma.') +
+              '<div class="btn-row"><button class="btn primary mg-q">Parte 2 · Elevador de Hadamard<span class="k"> [E]</span></button></div></div>';
+            faces(body);
+            var q2 = function () { quantumPart(g); };
+            q(body, '.mg-q').addEventListener('click', q2); ctl.interact = q2; ctl.digit = null;
+          };
+          q(out, '.mg-go').addEventListener('click', go); ctl.interact = go; ctl.digit = null;
+        } else {
+          AF.Audio.play('hurt');
+          out.innerHTML = '<div class="quiz-fb bad"><b>A lâmpada não bate com o desejado.</b> Compare as linhas marcadas com ✗ e escolha outra porta.</div>';
+        }
+        reveal(out);
+      }
+      draw(null);
+    }
+  }
+
+  /* Parte 2 · o Elevador de Hadamard (quântico), no mesmo painel */
+  function quantumPart(g) {
     var body = g.body, ctl = g.ctl;
     var solved = S.count('elevSolved');
     var st = { idx: Math.min(solved, EL_PUZ.length - 1), seq: [], busy: false, predicted: null };
@@ -570,6 +653,7 @@
             solved = st.idx + 1; S.d.counters.elevSolved = solved; S.addCredits(2);
             if (solved >= EL_PUZ.length && !S.flag('miniElevador')) {
               S.setFlag('miniElevador'); S.addCredits(5);
+              if (!S.flag('gateOpen')) AF.Toast.show('Credencial de Operador(a) de Portas emitida: o K-7 vai reconhecer você', 'gold');
               ['porta_x', 'porta_h', 'porta_z', 'interferencia', 'fase_global'].forEach(function (k) { S.unlock(k); });
               S.addJournal('Elevador de Hadamard', 'No Elevador Lacerda, a Cidade Baixa era |0⟩ e a Cidade Alta, |1⟩. X troca as estações; H cria superposição; duas H seguidas voltam à Cidade Baixa porque os caminhos até a Alta se cancelam (interferência); Z só troca um sinal, invisível numa medida direta, mas H·Z·H vira X. Foi assim que entendi por que Jamal precisa corrigir a fase.');
             }
@@ -597,6 +681,7 @@
       body.innerHTML = '<div class="mg-end"><div class="quiz-end-title">ELEVADOR DE HADAMARD · CONCLUÍDO</div>' +
         say('iasmin', 'O Elevador conta a mesma história do teletransporte: <b>X</b> troca |0⟩ e |1⟩, <b>Z</b> mexe no sinal (a fase) e <b>H</b> faz as amplitudes interferirem. Só a fase certa leva cada passageiro ao andar certo — como a correção certa leva o estado da D-7 até Jacobina.') +
         '<ul class="mg-take"><li><b>X</b> (Troca): |0⟩ ↔ |1⟩.</li><li><b>H</b>: superposição; <b>H · H</b> = nada (interferência).</li><li><b>Z</b>: muda o sinal de |1⟩ — invisível sozinha, decisiva com H.</li><li><b>H · Z · H = X</b>.</li></ul>' +
+        (S.flag('gateOpen') ? '' : '<div class="quiz-fb ok"><b>Credencial de Operador(a) de Portas emitida.</b> Com ela, o drone K-7 libera o portão da Torre da Afrotech.</div>') +
         '<div class="btn-row"><button class="btn primary mg-close">Voltar à praça<span class="k"> [E]</span></button></div></div>';
       faces(body);
       var c = function () { g.m.close(); AF.HUD.refresh(); };
@@ -1039,5 +1124,82 @@
     return g.m;
   }
 
-  AF.Mini = { acaraje: acaraje, elevador: elevador, mercado: mercado, jacobina: jacobina };
+  /* =====================================================================
+   * 5) JOGO DA MEMÓRIA QUÂNTICO — com Kauã
+   *    Virar uma carta é "medir": antes disso ela está em |?⟩.
+   *    Um dos pares está emaranhado: medir uma das cartas revela onde está a outra.
+   * ===================================================================== */
+  var MEM_PAIRS = [
+    ['<span class="ket">|0⟩</span>', 'Polo norte da esfera de Bloch'],
+    ['<span class="ket">|1⟩</span>', 'Polo sul da esfera de Bloch'],
+    ['Porta <b>X</b>', 'Troca |0⟩ por |1⟩: o NOT quântico'],
+    ['Porta <b>H</b>', 'Cria a superposição (|0⟩+|1⟩)/√2'],
+    ['Porta <b>Z</b>', 'Troca o sinal de |1⟩: muda a fase'],
+    ['<b>CNOT</b>', 'Faz o XOR no 2º qubit e emaranha o par'],
+    ['<b>Medição</b>', 'Colapsa em 0 ou 1 (regra de Born)'],
+    ['<b>Decoerência</b>', 'O ambiente apaga a superposição']
+  ];
+  function memoria() {
+    var g = open('Jogo da Memória Quântico · com Kauã', 'mg-mem');
+    var body = g.body, ctl = g.ctl;
+    var cards = [], up = [], moves = 0, found = 0, lock = false, t0 = Date.now();
+    var ent = Math.floor(Math.random() * MEM_PAIRS.length);
+    MEM_PAIRS.forEach(function (p, i) { cards.push({ pair: i, face: p[0], ok: false }); cards.push({ pair: i, face: p[1], ok: false }); });
+    for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
+
+    body.innerHTML = say('kaua', 'Montei esse jogo da memória com as cartas das oficinas da Prof.ª Iasmin. Ache o par de cada conceito! Carta virada pra baixo está em <b>|?⟩</b>: virar é <b>medir</b>. E se liga: um dos pares está <b>emaranhado</b> — quando você mede uma carta dele, a parceira acende.') +
+      '<div class="mem-stat"><span class="m-moves">Jogadas: 0</span><span class="m-found">Pares: 0/8</span></div><div class="mem-grid"></div><div class="mg-out"></div>';
+    faces(body);
+    var grid = q(body, '.mem-grid');
+    body._mem = cards;                                   /* (para testes automáticos) */
+    cards.forEach(function (c, idx) {
+      var b = AF.el('button', 'mem-card', '<span class="ket">|?⟩</span>');
+      b.addEventListener('click', function () { flip(idx); });
+      grid.appendChild(b); c.el = b;
+    });
+    function show(c, on) { c.el.classList.toggle('up', on); c.el.innerHTML = on ? c.face : '<span class="ket">|?⟩</span>'; }
+    function flip(idx) {
+      var c = cards[idx];
+      if (lock || c.ok || up.indexOf(idx) >= 0) return;
+      AF.Audio.play('card');
+      show(c, true); up.push(idx);
+      if (c.pair === ent && up.length === 1) {               /* o par emaranhado entrega a parceira */
+        cards.forEach(function (o) { if (o !== c && o.pair === ent && !o.ok) { o.el.classList.add('ent'); setTimeout(function () { o.el.classList.remove('ent'); }, 1500); } });
+        AF.Audio.play('quantum');
+      }
+      if (up.length < 2) return;
+      moves++;
+      q(body, '.m-moves').textContent = 'Jogadas: ' + moves;
+      var a = cards[up[0]], b = cards[up[1]];
+      if (a.pair === b.pair) {
+        a.ok = b.ok = true; a.el.classList.add('ok'); b.el.classList.add('ok'); up = []; found++;
+        q(body, '.m-found').textContent = 'Pares: ' + found + '/8';
+        AF.Audio.play('success');
+        if (found === MEM_PAIRS.length) setTimeout(finish, 500);
+      } else {
+        lock = true;
+        setTimeout(function () { show(a, false); show(b, false); up = []; lock = false; }, 950);
+      }
+    }
+    function finish() {
+      var secs = Math.round((Date.now() - t0) / 1000), first = !S.flag('memoria');
+      var prize = first ? (moves <= 14 ? 6 : 4) : 0;
+      if (first) {
+        S.setFlag('memoria'); S.addCredits(prize);
+        S.addJournal('Jogo da Memória Quântico', 'Joguei com Kauã: |0⟩ e |1⟩ nos polos da esfera de Bloch; X troca, H superpõe, Z muda a fase; CNOT emaranha; medir colapsa; a decoerência apaga a superposição. Terminei em ' + moves + ' jogadas.');
+      }
+      S.mg('memoria', { jogadas: moves, tempo: secs });
+      var out = q(body, '.mg-out');
+      out.innerHTML = '<div class="quiz-fb ok"><b>Todos os pares!</b> ' + moves + ' jogadas em ' + secs + ' s.' + (prize ? ' Kauã te paga ' + prize + ' CQ pelo recorde.' : '') +
+        ' Repare: no jogo, a carta emaranhada só "contou" onde estava a parceira depois que você mediu uma delas — e isso não manda mensagem nenhuma, é só correlação.</div>' +
+        '<div class="mg-btns"><button class="btn mg-again">Jogar de novo</button><button class="btn primary mg-close">Valeu, Kauã!<span class="k"> [E]</span></button></div>';
+      var c = function () { g.m.close(); AF.HUD.refresh(); };
+      q(out, '.mg-close').addEventListener('click', c); ctl.interact = c;
+      q(out, '.mg-again').addEventListener('click', function () { g.m.close(true); memoria(); });
+      reveal(out);
+    }
+    return g.m;
+  }
+
+  AF.Mini = { acaraje: acaraje, elevador: elevador, mercado: mercado, jacobina: jacobina, memoria: memoria };
 })(window.AF);

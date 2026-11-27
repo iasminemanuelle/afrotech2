@@ -465,6 +465,121 @@
       });
     },
 
+    /* ---------- v0.8: loja, VLT, praia, casa na Ribeira ---------- */
+    arara: function () {                                   /* arara de roupas da Boutique do Mercado */
+      return P.sprite(34, 30, function (g) {
+        g.rect(2, 4, 2, 24, '#8a8aa8'); g.rect(30, 4, 2, 24, '#8a8aa8'); g.rect(2, 3, 30, 2, '#b8b4d0');
+        g.rect(0, 27, 6, 2, '#5a5672'); g.rect(28, 27, 6, 2, '#5a5672');
+        var cl = ['#ffc940', '#ff3fa4', '#3dff9a', '#d8243a', '#1a8a9a', '#f2f0f8'];
+        for (var i = 0; i < 6; i++) {
+          var x = 5 + i * 4, c = cl[i];
+          g.px(x + 1, 5, '#8a8aa8'); g.rect(x, 6, 4, 2, c); g.rect(x, 8, 4, 10 + (i % 2) * 3, c); g.rect(x + 3, 8, 1, 10 + (i % 2) * 3, P.shade(c, -30));
+          if (i === 3) { g.px(x + 1, 10, '#ffe08a'); g.px(x + 2, 13, '#ffe08a'); }
+          if (i === 0) { g.rect(x, 11, 3, 1, '#10a860'); g.rect(x, 14, 3, 1, '#d8243a'); }
+        }
+      }, true);
+    },
+    vlt: function () {                                     /* parada e composição do VLT da Baía */
+      return mk(96, 46, function (ctx, r) {
+        r(0, 36, 96, 10, '#3a3456'); r(0, 36, 96, 2, '#9a94b4'); r(0, 43, 96, 3, '#1a1630');
+        r(0, 32, 96, 3, '#141428'); for (var x = 2; x < 96; x += 8) r(x, 33, 4, 1, '#ffc940');
+        r(6, 12, 84, 20, '#ffc940'); r(6, 12, 84, 3, '#ffe08a'); r(6, 29, 84, 3, '#b07a10');
+        r(2, 16, 6, 12, '#e8b830'); r(88, 16, 6, 12, '#e8b830');
+        for (var w = 12; w < 84; w += 12) { r(w, 16, 9, 7, '#0a2238'); r(w + 1, 17, 7, 2, '#3a7ab0'); }
+        r(44, 16, 8, 13, '#0a2238'); r(47, 16, 1, 13, '#ffc940');
+        r(6, 25, 84, 2, '#1a8a9a');
+        r(30, 0, 36, 9, '#141428'); P.text(ctx, 'VLT BAIA', 33, 2, '#ffc940');
+        r(47, 9, 2, 3, '#6e6888');
+      });
+    },
+    prancha: function () {                                 /* prancha de surfe fincada na areia */
+      return P.sprite(12, 30, function (g) {
+        for (var y = 0; y < 26; y++) { var w = y < 3 ? 2 + y : (y > 22 ? 2 + (25 - y) : 6); g.rect(6 - Math.ceil(w / 2), y, w, 1, '#f2f0f8'); }
+        g.rect(5, 2, 2, 22, '#ff8a3d'); g.rect(4, 10, 4, 1, '#1a6a9a');
+        g.rect(2, 25, 8, 3, '#d8c08a');
+      }, true);
+    },
+    boia: function () {
+      return P.sprite(14, 12, function (g) {
+        g.rect(3, 2, 8, 6, '#ff8a3d'); g.rect(2, 3, 10, 4, '#ff8a3d'); g.rect(3, 4, 8, 1, '#f2f0f8');
+        g.rect(6, 0, 2, 2, '#f2f0f8'); g.rect(1, 8, 12, 1, '#e8f6ff');
+      }, true);
+    },
+    cama: function () {
+      return P.sprite(30, 24, function (g) {
+        g.rect(0, 2, 30, 4, '#6a4228'); g.rect(1, 6, 28, 14, '#f2f0f8'); g.rect(1, 12, 28, 8, '#3a9ab0');
+        for (var x = 2; x < 28; x += 4) g.px(x, 15, '#ffc940');
+        g.rect(3, 7, 9, 4, '#ecebf6'); g.rect(3, 10, 9, 1, '#c8c4d8');
+        g.rect(0, 20, 30, 2, '#5a3a24'); g.rect(1, 22, 2, 2, '#4a2a1a'); g.rect(27, 22, 2, 2, '#4a2a1a');
+      }, true);
+    },
+    guardaroupa: function () {
+      return P.sprite(24, 32, function (g) {
+        g.rect(0, 0, 24, 30, '#7a5034'); g.rect(1, 1, 22, 28, '#8a5a3a'); g.rect(11, 2, 2, 26, '#5a3a24');
+        g.rect(3, 3, 7, 24, '#9a6a44'); g.rect(14, 3, 7, 24, '#9a6a44');
+        g.px(9, 15, '#ffc940'); g.px(14, 15, '#ffc940'); g.rect(1, 29, 22, 3, '#5a3a24');
+      }, true);
+    },
+    mesa_casa: function () {
+      return P.sprite(28, 22, function (g) {
+        g.rect(0, 8, 28, 4, '#8a5a3a'); g.rect(0, 8, 28, 1, '#a06a3e'); g.rect(2, 12, 2, 10, '#6a4228'); g.rect(24, 12, 2, 10, '#6a4228');
+        g.rect(3, 2, 9, 6, '#3a3456'); g.rect(4, 3, 4, 3, '#1a1630'); g.px(10, 4, '#ff3fa4'); g.rect(2, 1, 1, 3, '#9a94b4');   /* rádio */
+        g.rect(16, 4, 6, 4, '#f2f0f8'); g.rect(17, 2, 4, 2, '#3dff9a'); g.px(19, 1, '#ff3fa4');                              /* vaso de flor */
+      }, true);
+    },
+    mural: function () {
+      return P.sprite(30, 16, function (g) {
+        g.rect(0, 0, 30, 16, '#6a4228'); g.rect(1, 1, 28, 14, '#c8a878');
+        g.rect(3, 3, 7, 5, '#f2f0f8'); g.rect(4, 4, 5, 3, '#3a9ab0');
+        g.rect(12, 2, 6, 7, '#f2f0f8'); g.rect(13, 3, 4, 4, '#ffc940');
+        g.rect(20, 4, 7, 5, '#f2f0f8'); g.rect(21, 5, 5, 3, '#ff3fa4');
+        g.rect(5, 10, 18, 1, '#3dff9a'); g.rect(8, 12, 12, 1, '#1a4a9a');
+      }, true);
+    },
+    sorveteria: function () {                              /* carrinho de sorvete da orla da Ribeira */
+      return P.sprite(32, 34, function (g) {
+        for (var y = 0; y < 8; y++) { var hw = 4 + Math.round(y * 1.6); for (var x = -hw; x <= hw; x++) g.px(16 + x, 1 + y, ((x + 40) >> 2) % 2 ? '#f2f0f8' : '#3a9ab0'); }
+        g.rect(15, 9, 2, 10, '#d8d4e8');
+        g.rect(4, 18, 24, 12, '#f2f0f8'); g.rect(4, 18, 24, 2, '#3a9ab0'); g.rect(6, 22, 20, 6, '#e8ecf6');
+        g.rect(8, 23, 3, 3, '#ffe08a'); g.rect(13, 23, 3, 3, '#8a5a3a'); g.rect(18, 23, 3, 3, '#ff9ac4'); g.rect(23, 23, 2, 3, '#3dff9a');
+        g.rect(6, 30, 4, 4, '#3a3456'); g.rect(22, 30, 4, 4, '#3a3456');
+      }, true);
+    },
+    placa_ribeira: function () {
+      return mk(60, 30, function (ctx, r) {
+        r(28, 12, 4, 18, '#5a3a24'); r(0, 0, 60, 14, '#1a4a9a'); r(1, 1, 58, 12, '#2a6ac8');
+        P.text(ctx, 'RIBEIRA', 16, 2, '#f2f0f8'); P.text(ctx, 'SALVADOR', 14, 8, '#ffc940');
+      });
+    },
+    /* horizonte da Ribeira: casario, a Colina Sagrada com a Basílica do Bonfim e o fim de tarde */
+    ribeira_sky: function () {
+      return mk(512, 48, function (ctx, r) {
+        var rng = P.rng(2026);
+        for (var y = 0; y < 48; y++) {
+          var t = y / 47;
+          var c0 = [255, 150, 90], c1 = [60, 30, 90];
+          var c = c0.map(function (v, i) { return Math.round(c1[i] + (v - c1[i]) * t); });
+          r(0, y, 512, 1, 'rgb(' + c.join(',') + ')');
+        }
+        r(0, 40, 512, 8, '#3a2a4a');
+        /* colina com a basílica */
+        for (var x = 300; x < 470; x++) { var hgt = Math.round(22 * Math.sin((x - 300) / 170 * Math.PI)); r(x, 40 - hgt, 1, hgt, '#4a3a5a'); }
+        r(362, 8, 46, 12, '#f2eee0'); r(364, 2, 8, 6, '#f2eee0'); r(398, 2, 8, 6, '#f2eee0');
+        r(365, 0, 6, 2, '#3a9ab0'); r(399, 0, 6, 2, '#3a9ab0'); r(380, 4, 10, 4, '#f2eee0'); r(384, 1, 2, 3, '#ffc940');
+        r(382, 12, 6, 8, '#6a4228'); for (var wy = 10; wy < 18; wy += 4) { r(368, wy, 2, 2, '#3a9ab0'); r(400, wy, 2, 2, '#3a9ab0'); }
+        P.text(ctx, 'BONFIM', 372, 22, '#ffe08a');
+        /* casario */
+        var cols = ['#e8a838', '#3a9ab0', '#d86a8a', '#f2eee0', '#8ac04a', '#e8701a'];
+        for (var hx = 0; hx < 512; hx += 18) {
+          if (hx > 300 && hx < 470) continue;
+          var h = 10 + Math.floor(rng() * 14), col = cols[Math.floor(rng() * cols.length)];
+          r(hx, 40 - h, 16, h, col); r(hx, 40 - h - 2, 16, 2, '#b0502e');
+          r(hx + 3, 40 - h + 4, 3, 3, '#3a2a4a'); r(hx + 10, 40 - h + 4, 3, 3, '#3a2a4a');
+        }
+        r(0, 46, 512, 2, '#1a1630');
+      });
+    },
+
     /* Caixa de emenda da fibra óptica */
     fibra: function () {
       return P.sprite(16, 22, function (g) {

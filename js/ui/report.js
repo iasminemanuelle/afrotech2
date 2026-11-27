@@ -25,7 +25,8 @@
     ['quizDone', 'Quiz da Prof.ª Iasmin'], ['tableDone', 'Roteiro no simulador'], ['codeDecoded', 'Decifrou o código'],
     ['circuitBuilt', 'Circuito reconstruído'], ['validated', 'Validação (5 seguidos)'], ['restored', 'Missão cumprida']
   ];
-  var MINIS = [['acarajeQ', 'Acarajé'], ['miniElevador', 'Elevador'], ['miniMercado', 'Gincana'], ['jacobinaDone', 'Jacobina'], ['hohenfeldStory', 'Hohenfeld']];
+  var MINIS = [['acarajeQ', 'Acarajé'], ['portasClassicas', 'Portas lógicas'], ['miniElevador', 'Elevador'], ['memoria', 'Memória'], ['miniMercado', 'Gincana'],
+    ['jacobinaDone', 'Jacobina'], ['hohenfeldStory', 'Hohenfeld'], ['mulheresCiencia', 'Mulheres na ciência'], ['natacao', 'Natação']];
 
   /* rótulos das perguntas registradas (trilha → item → texto) */
   function qLabels() {

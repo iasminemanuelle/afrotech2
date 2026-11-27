@@ -27,6 +27,9 @@
     socorro: { name: 'Dona Socorro', spec: 'socorro' },
     davi: { name: 'Davi', spec: 'davi' },
     hohenfeld: { name: 'Prof. Hohenfeld', spec: 'hohenfeld' },
+    miayo: { name: 'Mi Ayô', spec: 'miayo' },
+    lu: { name: 'Dona Lu (Boutique)', spec: 'lu' },
+    didi: { name: 'Seu Didi', spec: 'didi' },
     player: { name: '{name}', player: true },
     narrador: { name: '', portrait: null }
   };
@@ -60,7 +63,7 @@
       b: { speaker: 'narrador', text: 'De repente, todas as comunicações cessam. Nenhuma mensagem atravessa o canal quântico. No alto do Elevador Lacerda 2.0, as projeções que narravam a história da Bahia piscam e somem. O mundo acabou de ficar mudo.', next: 'c' },
       c: { speaker: 'oraculo', text: 'Conexão estabelecida. Agente {name}, aqui é o Oráculo, interface de diagnóstico da Afrotech. Olhe para sua ficha: você não é mais estudante — é especialista convocado(a) para uma força-tarefa de emergência.', next: 'd' },
       d: { speaker: 'oraculo', text: 'Missão inicial: descobrir o que causou o colapso no canal quântico e restaurar o fluxo de informações. Esqueça o que sabe sobre transporte de objetos. Aqui, a informação viaja por outros caminhos.', next: 'e' },
-      e: { speaker: 'oraculo', text: 'Siga para a Torre da Afrotech, o monólito de grafeno e vidro a leste da praça. E lembre: aqui, erro não é fim de jogo. É ruído — e ruído a gente corrige.',
+      e: { speaker: 'oraculo', text: 'Seu destino é a Torre da Afrotech, o monólito de grafeno e vidro a leste da praça. Mas antes passe no Elevador Lacerda: lá você tira a Credencial de Operador(a) de Portas, sem a qual o drone do portão não deixa ninguém entrar. E lembre: aqui, erro não é fim de jogo. É ruído — e ruído a gente corrige.',
         choices: [
           { t: 'A caminho da Torre.', close: true, action: function () { introJournal(); ciciChama(); } },
           { t: 'O que exatamente parou de funcionar?', next: 'f' }
@@ -173,10 +176,21 @@
 
     elevador: { start: 'a', nodes: {
       a: { speaker: 'narrador', redirect: function () { return S.flag('restored') ? 'b' : 'a2'; } },
-      a2: { speaker: 'narrador', text: 'O Elevador Lacerda — o Espinhaço. Deixou de ser só transporte: é o "nervo óptico" que liga os supercomputadores da Cidade Alta aos laboratórios e portos da Cidade Baixa. Hoje, só o backup clássico ainda pulsa nos cabos. Na porta da cabine, uma placa: "ELEVADOR DE HADAMARD — em manutenção até o canal quântico voltar".' },
+      a2: { speaker: 'narrador', text: function () {
+        return 'O Elevador Lacerda — o Espinhaço. Deixou de ser só transporte: é o "nervo óptico" que liga os supercomputadores da Cidade Alta aos laboratórios e portos da Cidade Baixa. Hoje só o backup clássico pulsa nos cabos. ' +
+          (S.flag('miniElevador') ? 'No painel da cabine, sua Credencial de Operador(a) de Portas brilha em dourado.'
+            : 'Na porta da cabine, um aviso do Oráculo: "TREINAMENTO OBRIGATÓRIO — antes de entrar na Torre da Afrotech, todo(a) agente tira aqui a Credencial de Operador(a) de Portas: primeiro as portas lógicas clássicas, depois as quânticas."');
+      },
+        choices: [
+          { t: function () { return S.flag('miniElevador') ? 'Treinar de novo no painel de portas' : (S.flag('portasClassicas') ? 'Continuar o treinamento: Elevador de Hadamard (' + Math.min(5, S.count('elevSolved')) + '/5)' : 'Começar o treinamento de portas lógicas'); },
+            close: true, action: function () { AF.Mini.elevador(); } },
+          { t: 'Por que preciso disso para entrar na Torre?', next: 'a3', if: function () { return !S.flag('miniElevador'); } },
+          { t: 'Depois.', close: true }
+        ] },
+      a3: { speaker: 'oraculo', text: 'Todo computador — clássico ou quântico — é feito de portas. Lá dentro, você vai reconstruir um circuito de teletransporte com H, CNOT, X e Z. Quem não sabe o que uma porta faz com um bit não entende o que ela faz com um qubit. O drone K-7 só libera o portão com a credencial.', next: 'a2' },
       b: { speaker: 'narrador', text: 'O Espinhaço brilha, pulsando com petabytes de informação. Na porta da cabine, a placa mudou: "ELEVADOR DE HADAMARD — Cidade Baixa = |0⟩, Cidade Alta = |1⟩. Operadores de portas quânticas, bem-vindos!"',
         choices: [
-          { t: 'Operar o Elevador de Hadamard (desafio)', close: true, action: function () { AF.Mini.elevador(); } },
+          { t: 'Operar o painel de portas do Elevador (desafio)', close: true, action: function () { AF.Mini.elevador(); } },
           { t: 'Como assim, Cidade Baixa é |0⟩?', next: 'c' },
           { t: 'Só admirar a vista.', close: true }
         ] },
@@ -250,15 +264,17 @@
     /* ===================== PRAINHA DA BAÍA · PROF. HOHENFELD ===================== */
     hohenfeld: { start: 'a', nodes: {
       a: { speaker: 'narrador', redirect: function () { return S.flag('metHohenfeld') ? 'm' : 'a2'; } },
-      a2: { speaker: 'narrador', text: 'De frente para o mar, um senhor de óculos desenha ondas a giz numa lousinha apoiada num cavalete. Ao fundo, o Forte São Marcelo pisca no meio da baía.', next: 'b' },
-      b: { speaker: 'hohenfeld', text: 'Boa tarde, {name}! Chegou na hora da maré. Sente aí. Você veio da Torre, não veio? Tem cara de quem passou o dia conversando com qubit.',
+      a2: { speaker: 'narrador', text: 'De frente para o mar, um professor de lycra de surfe e bermuda, cabelo e cavanhaque pretos, desenha ondas a giz numa lousinha apoiada num cavalete. A prancha está fincada na areia. Ao fundo, o Forte São Marcelo pisca no meio da baía.', next: 'b' },
+      b: { speaker: 'hohenfeld', text: 'Boa tarde, {name}! Chegou na hora da maré — acabei de sair da água. Sente aí. Você veio da Torre, não veio? Tem cara de quem passou o dia conversando com qubit.',
         onEnter: function () { S.setFlag('metHohenfeld'); }, next: 'm' },
       m: { speaker: 'hohenfeld', text: 'O que você quer saber? Aqui na prainha o tempo é outro: dá para conversar sem pressa.',
         choices: [
           { t: 'O senhor é professor de física?', next: 'c' },
           { t: 'Como se ensina física quântica para quem nunca viu um qubit?', next: 'd' },
-          { t: 'Conta uma história da física quântica?', next: 'e' },
+          { t: 'Conta uma história da física quântica?', next: 'hist' },
+          { t: 'E as mulheres na ciência? Me conta delas.', next: 'mul' },
           { t: 'Por que contar ciência num RPG?', next: 'f' },
+          { t: 'O senhor surfa?', next: 'surf' },
           { t: 'Restauramos o canal quântico!', if: function () { return S.flag('restored') && !S.flag('hohenfeldStory'); }, next: 'r' },
           { t: 'Até logo, professor.', close: true }
         ] },
@@ -273,7 +289,72 @@
       e: { speaker: 'hohenfeld', text: 'Então escute. Em 1935, Einstein, Podolsky e Rosen argumentaram que a mecânica quântica devia estar incompleta: partículas separadas pareciam combinadas demais. Anos depois, Einstein chamaria isso de "ação fantasmagórica à distância".', next: 'e2' },
       e2: { speaker: 'hohenfeld', text: 'No mesmo ano de 1935, Schrödinger respondeu com o gato na caixa — e deu nome ao fenômeno: emaranhamento. Quase trinta anos depois, em 1964, John Bell transformou a briga filosófica numa conta que dava para testar no laboratório.', next: 'e3' },
       e3: { speaker: 'hohenfeld', text: 'Os experimentos vieram: Clauser, Aspect, Zeilinger… Em 1993 propuseram o teletransporte quântico; em 1997 ele foi feito com fótons. E em 2022 os três receberam o Nobel. Viu? Uma discussão de café virou a tecnologia que você acabou de consertar.',
-        onEnter: function () { S.unlock('epr_bell'); }, next: 'm' },
+        onEnter: function () { S.unlock('epr_bell'); heard('epr', 'q'); }, next: 'hist' },
+
+      /* ---- histórias da mecânica quântica ---- */
+      hist: { speaker: 'hohenfeld', text: 'Tenho um baú de histórias. Escolha uma — eu conto do jeito que conto para a turma.',
+        choices: [
+          { t: function () { return tick('planck') + '1900 · Planck e o "ato de desespero"'; }, next: 'q_planck' },
+          { t: function () { return tick('einstein') + '1905 · Einstein e os pacotes de luz'; }, next: 'q_einstein' },
+          { t: function () { return tick('ondas') + '1913–1924 · Bohr, de Broglie e as ondas de matéria'; }, next: 'q_ondas' },
+          { t: function () { return tick('helgoland') + '1925–1927 · Heisenberg numa ilha, Schrödinger e a incerteza'; }, next: 'q_helg' },
+          { t: function () { return tick('epr') + '1935–2022 · o emaranhamento: de briga a Nobel'; }, next: 'e' },
+          { t: function () { return tick('nobel25') + '2025 · um circuito quântico do tamanho de uma mão'; }, next: 'q_nobel' },
+          { t: 'Voltar', next: 'm' }
+        ] },
+      q_planck: { speaker: 'hohenfeld', text: 'Em 1900, Max Planck tentava explicar a cor da luz que sai de um corpo quente — um ferro em brasa, um forno. Nada fechava. Ele então supôs que a energia era trocada em pacotinhos, os quanta. Anos depois, chamou isso de "um ato de desespero".', next: 'q_planck2' },
+      q_planck2: { speaker: 'hohenfeld', text: 'Repare: a física quântica nasceu de um remendo que deu certo. Planck nem acreditava muito nele. É assim que a ciência anda: alguém aceita uma ideia esquisita porque ela explica o que o resto não explica.', onEnter: function () { heard('planck', 'q'); }, next: 'hist' },
+      q_einstein: { speaker: 'hohenfeld', text: 'Em 1905, um jovem funcionário de um escritório de patentes, Albert Einstein, levou os quanta a sério: a própria luz viria em pacotes — os fótons. Isso explicava o efeito fotoelétrico, a luz arrancando elétrons de um metal.', next: 'q_einstein2' },
+      q_einstein2: { speaker: 'hohenfeld', text: 'E olhe a ironia: o Nobel de Einstein, de 1921, foi pelo efeito fotoelétrico, não pela relatividade. O mesmo Einstein que ajudou a criar a quântica passou a vida brigando com ela.', onEnter: function () { heard('einstein', 'q'); }, next: 'hist' },
+      q_ondas: { speaker: 'hohenfeld', text: 'Em 1913, Niels Bohr desenhou um átomo em que o elétron só pode ocupar certas órbitas — e pula de uma para outra soltando luz. Em 1924, Louis de Broglie virou o jogo: se a luz é onda e partícula, o elétron também pode ser. Ondas de matéria!', next: 'q_ondas2' },
+      q_ondas2: { speaker: 'hohenfeld', text: 'Três anos depois, elétrons passando por um cristal fizeram figura de interferência, como as ondas que eu desenho nessa lousa. A natureza confirmou a ousadia de um estudante de doutorado.', onEnter: function () { heard('ondas', 'q'); }, next: 'hist' },
+      q_helg: { speaker: 'hohenfeld', text: 'Em 1925, Werner Heisenberg, com uma crise de alergia, foi se tratar na ilha de Helgoland, no Mar do Norte. Voltou com a primeira versão da mecânica quântica, feita de tabelas de números. No ano seguinte, Schrödinger escreveu a sua famosa equação de ondas.', next: 'q_helg2' },
+      q_helg2: { speaker: 'hohenfeld', text: 'Em 1927 veio o princípio da incerteza: não dá para conhecer, ao mesmo tempo e com precisão total, a posição e a velocidade de um elétron. E naquele mesmo ano, na Conferência de Solvay, os maiores físicos do mundo se reuniram para brigar sobre o que tudo aquilo significava.', onEnter: function () { heard('helgoland', 'q'); }, next: 'hist' },
+      q_nobel: { speaker: 'hohenfeld', text: 'Em 1984 e 1985, John Clarke, Michel Devoret e John Martinis montaram um circuito supercondutor com uma junção Josephson e viram a corrente "tunelar" por uma barreira e só aceitar níveis de energia quantizados — num objeto grande o bastante para segurar na mão.', next: 'q_nobel2' },
+      q_nobel2: { speaker: 'hohenfeld', text: 'Isso rendeu o Nobel de Física de 2025, e é a semente dos qubits supercondutores, como os do Núcleo da Afrotech. E tem Brasil nessa história: o trabalho teórico do físico brasileiro Amir Caldeira ajudou a mostrar como observar esse efeito.',
+        onEnter: function () { heard('nobel25', 'q'); S.unlock('tunelamento_macro'); }, next: 'hist' },
+
+      /* ---- mulheres na ciência ---- */
+      mul: { speaker: 'hohenfeld', text: 'Essa é a parte da história que muito livro esqueceu de contar. Escolha uma cientista.',
+        choices: [
+          { t: function () { return tick('curie') + 'Marie Curie · dois Nobel e a única mulher em Solvay'; }, next: 'w_curie' },
+          { t: function () { return tick('noether') + 'Emmy Noether · simetrias e leis de conservação'; }, next: 'w_noether' },
+          { t: function () { return tick('meitner') + 'Lise Meitner · a fissão nuclear'; }, next: 'w_meitner' },
+          { t: function () { return tick('wu') + 'Chien-Shiung Wu · fótons emaranhados e o espelho quebrado'; }, next: 'w_wu' },
+          { t: function () { return tick('hermann') + 'Grete Hermann · a falha na prova de von Neumann'; }, next: 'w_hermann' },
+          { t: function () { return tick('nobel_m') + 'As mulheres no Nobel de Física'; }, next: 'w_nobel' },
+          { t: 'Cientistas do Brasil e da Bahia…', next: 'mul_br' },
+          { t: 'Voltar', next: 'm' }
+        ] },
+      mul_br: { speaker: 'hohenfeld', text: 'Aqui pertinho tem muita história boa. Qual delas?',
+        choices: [
+          { t: function () { return tick('elisa') + 'Elisa Frota-Pessôa · pioneira da física no Brasil'; }, next: 'w_elisa' },
+          { t: function () { return tick('sonia') + 'Sonia Guimarães · a primeira doutora negra em física'; }, next: 'w_sonia' },
+          { t: function () { return tick('katemari') + 'Katemari Rosa · física na UFBA, aqui em Salvador'; }, next: 'w_katemari' },
+          { t: function () { return tick('jaqueline') + 'Jaqueline Goes de Jesus · a baiana do genoma'; }, next: 'w_jaqueline' },
+          { t: 'Voltar', next: 'mul' }
+        ] },
+      w_curie: { speaker: 'hohenfeld', text: 'Marie Curie estudou a radioatividade — e cunhou a própria palavra. Ganhou o Nobel de Física em 1903 e o de Química em 1911: até hoje é a única pessoa premiada em duas ciências diferentes.', next: 'w_curie2' },
+      w_curie2: { speaker: 'hohenfeld', text: 'Em 1927, na Conferência de Solvay, onde Einstein, Bohr, Heisenberg e Schrödinger discutiram a nova mecânica quântica, ela era a única mulher na fotografia. Imagine a coragem de estar naquela sala.', onEnter: function () { heard('curie', 'w'); }, next: 'mul' },
+      w_noether: { speaker: 'hohenfeld', text: 'Emmy Noether provou, em 1918, um teorema que hoje está em toda a física: cada simetria da natureza corresponde a uma grandeza que se conserva. Se as leis não mudam com o tempo, a energia se conserva; se não mudam de lugar para lugar, o momento se conserva.', next: 'w_noether2' },
+      w_noether2: { speaker: 'hohenfeld', text: 'Por ser mulher, durante anos ela deu aula na Universidade de Göttingen sem salário, com o curso anunciado no nome de um colega. Quando ela morreu, Einstein escreveu que ela era um gênio da matemática.', onEnter: function () { heard('noether', 'w'); }, next: 'mul' },
+      w_meitner: { speaker: 'hohenfeld', text: 'Lise Meitner, com o sobrinho Otto Frisch, explicou entre 1938 e 1939 o que acontecia nas experiências de Otto Hahn: o núcleo do urânio estava se partindo em dois. Deram a isso o nome de fissão nuclear.', next: 'w_meitner2' },
+      w_meitner2: { speaker: 'hohenfeld', text: 'O Nobel de Química de 1944 foi só para Hahn. Meitner ficou de fora. A ciência tentou consertar depois: o elemento químico 109 se chama meitnério, em homenagem a ela.', onEnter: function () { heard('meitner', 'w'); }, next: 'mul' },
+      w_wu: { speaker: 'hohenfeld', text: 'Chien-Shiung Wu era uma experimentadora brilhante. Em 1950, com o estudante Irving Shaknov, mediu os pares de fótons que nascem quando um elétron e um pósitron se aniquilam: as polarizações vinham correlacionadas. Hoje esse é lembrado como um dos primeiros experimentos com partículas emaranhadas.', next: 'w_wu2' },
+      w_wu2: { speaker: 'hohenfeld', text: 'Em 1956, ela mostrou que a natureza distingue a esquerda da direita — a violação da paridade, o "espelho quebrado". O Nobel de 1957 foi para os dois teóricos que propuseram a ideia, Lee e Yang. O experimento que provou foi o dela.', onEnter: function () { heard('wu', 'w'); }, next: 'mul' },
+      w_hermann: { speaker: 'hohenfeld', text: 'Em 1932, John von Neumann publicou uma "prova" de que a mecânica quântica não podia ser completada com variáveis escondidas. Em 1935, a filósofa e matemática Grete Hermann mostrou que a prova tinha uma falha.', next: 'w_hermann2' },
+      w_hermann2: { speaker: 'hohenfeld', text: 'Quase ninguém deu ouvidos a ela. Três décadas depois, John Bell encontrou o mesmo problema — e partiu dali para criar o teste que hoje leva o nome dele. A história também é feita de quem não foi escutado.', onEnter: function () { heard('hermann', 'w'); }, next: 'mul' },
+      w_nobel: { speaker: 'hohenfeld', text: 'Até 2025, só cinco mulheres tinham recebido o Nobel de Física: Marie Curie (1903), Maria Goeppert Mayer (1963, pelo modelo de camadas do núcleo), Donna Strickland (2018, lasers), Andrea Ghez (2020, o buraco negro no centro da nossa galáxia) e Anne L\'Huillier (2023, pulsos de luz de attossegundos).', next: 'w_nobel2' },
+      w_nobel2: { speaker: 'hohenfeld', text: 'Cinco em mais de um século. Não é falta de talento: é falta de porta aberta. Por isso eu conto essas histórias — para que alguém da sua turma pense "esse lugar também é meu".', onEnter: function () { heard('nobel_m', 'w'); }, next: 'mul' },
+      w_elisa: { speaker: 'hohenfeld', text: 'Elisa Frota-Pessôa queria ser engenheira, mas diziam que era "coisa de homem". Foi para a física: em 1942 ela se tornou uma das duas primeiras mulheres formadas em física no Brasil.', next: 'w_elisa2' },
+      w_elisa2: { speaker: 'hohenfeld', text: 'Em 1949, ajudou a fundar o Centro Brasileiro de Pesquisas Físicas, no Rio. Estudava partículas com emulsões nucleares: chapas fotográficas levadas ao alto das montanhas para registrar os raios cósmicos.', onEnter: function () { heard('elisa', 'w'); }, next: 'mul_br' },
+      w_sonia: { speaker: 'hohenfeld', text: 'Sonia Guimarães, filha de um tapeceiro de São Paulo, estudou sempre em escola pública. Em 1989, com o doutorado na Universidade de Manchester, tornou-se a primeira mulher negra brasileira doutora em física.', next: 'w_sonia2' },
+      w_sonia2: { speaker: 'hohenfeld', text: 'Em 1993 virou professora do ITA — a primeira professora negra do instituto, numa época em que ele nem aceitava alunas mulheres. Ela costuma dizer que ser a primeira só faz sentido se houver muitas depois.', onEnter: function () { heard('sonia', 'w'); }, next: 'mul_br' },
+      w_katemari: { speaker: 'hohenfeld', text: 'Katemari Rosa é física e professora do Instituto de Física da UFBA, aqui em Salvador. Ela pesquisa o ensino de física e como gênero e raça atravessam a ciência.', next: 'w_katemari2' },
+      w_katemari2: { speaker: 'hohenfeld', text: 'E faz uma coisa que eu admiro muito: reúne as histórias de vida de cientistas negras e negros do Brasil, para que elas não se percam. Contadora de história, como eu gosto.', onEnter: function () { heard('katemari', 'w'); }, next: 'mul_br' },
+      w_jaqueline: { speaker: 'hohenfeld', text: 'Jaqueline Goes de Jesus é biomédica, nascida em Salvador, formada aqui na Bahia. Em 2020, a equipe que ela coordenou com Ester Sabino, na USP, sequenciou o genoma do novo coronavírus no Brasil em cerca de 48 horas.', next: 'w_jaqueline2' },
+      w_jaqueline2: { speaker: 'hohenfeld', text: 'Não é física quântica, é biologia — mas é a mesma ciência: perguntar, medir, testar e contar para todo mundo. E começou numa iniciação científica, como pode começar a de alguém da sua turma.', onEnter: function () { heard('jaqueline', 'w'); }, next: 'mul_br' },
+      surf: { speaker: 'hohenfeld', text: 'Desde menino! E o mar é a melhor aula de ondas que existe: crista, vale, comprimento de onda, interferência quando duas séries se cruzam… A diferença é que a onda quântica não molha ninguém: o que ela dá é a chance de encontrar a partícula aqui ou ali.', next: 'm' },
       f: { speaker: 'hohenfeld', text: 'Porque no RPG o estudante não assiste à história: vive. Cada rolagem de dados é uma hipótese posta à prova; cada erro vira ruído que se corrige, não castigo. E a turma resolve junto — um ajuda o outro a chegar onde, sozinho, ainda não chegaria.', next: 'm' },
       r: { speaker: 'hohenfeld', text: 'Eu vi o Elevador acender daqui da praia! Agora me diga, {name}: se você fosse contar essa aventura para uma turma do primeiro ano, por onde começaria?',
         choices: [
@@ -296,6 +377,136 @@
       b: { speaker: 'narrador', text: '"Viu? Ele sempre diz isso. A gente veio pela física e fica pela história", cochicha a estudante, sem tirar os olhos da lousinha.' }
     } },
 
+    prancha: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: 'A prancha do Prof. Hohenfeld, fincada na areia, ainda pingando. No deck, um adesivo desbotado: "A onda é a probabilidade. O surfista é a medida."' }
+    } },
+
+    /* ===================== AULA DE NATAÇÃO · MI AYÔ ===================== */
+    miayo: { start: 'a', nodes: {
+      a: { speaker: 'miayo', redirect: function () { return S.d.swim ? 'nadando' : 'b'; } },
+      b: { speaker: 'miayo', text: 'Ê, gente! Aula aberta de natação no mar! Bora, todo mundo, não tem idade, não tem tamanho, não tem pressa: a água da Baía de Todos-os-Santos é de todo mundo. Vem nadar, {name}?',
+        choices: [
+          { t: 'Bora nadar!', next: 'traje' },
+          { t: 'Como é a aula?', next: 'aula' },
+          { t: 'Hoje só vou olhar.', next: 'olhar' }
+        ] },
+      aula: { speaker: 'miayo', text: 'Aquecimento na areia, depois a gente entra junto. Primeiro, respirar: solta o ar debaixo d\'água e puxa quando o rosto sai. Na aula de hoje, quem quiser nada até as três boias laranja. E regra de ouro: no mar, ninguém nada sozinho.', next: 'b' },
+      olhar: { speaker: 'miayo', text: 'Tudo bem! O convite fica de pé. Quem olha o mar com calma também aprende: repare como as ondas chegam em séries.' },
+      traje: { speaker: 'miayo', text: 'Primeiro, traje de natação! No vestiário tem de tudo. Touca e óculos são por conta da aula. Qual vai ser?',
+        choices: [
+          { t: 'Maiô', close: true, action: function () { swimGo('maio'); } },
+          { t: 'Sunga', close: true, action: function () { swimGo('sunga'); } },
+          { t: 'Bermuda e camisa de lycra', close: true, action: function () { swimGo('bermuda'); } },
+          { t: 'Pensando melhor, depois.', close: true }
+        ] },
+      nadando: { speaker: 'miayo', text: 'Tá indo bem! Boias encontradas: {boias}/3.',
+        choices: [
+          { t: 'Continuar nadando', close: true },
+          { t: 'Sair da água e trocar de roupa', close: true, action: function () { AF.Swim.stop(); AF.Toast.show('De volta à roupa de sempre', 'dim'); } }
+        ] }
+    } },
+    miayo_dentro: { start: 'a', nodes: {
+      a: { speaker: 'miayo', text: 'Ficou massa! Agora é entrar na água pela espuma, aqui na frente, e nadar até as três boias laranja. Eu fico de olho daqui da areia. Respira no ritmo!' }
+    } },
+    miayo_fim: { start: 'a', nodes: {
+      a: { speaker: 'miayo', text: 'Três boias! Ê, nadador(a)! Viu como a respiração no ritmo deixa tudo mais leve? É que nem qubit, {name}: sem calma e sem cuidado com o ambiente, a coisa desanda. Pode nadar mais um pouco ou sair quando quiser — é só falar comigo.' }
+    } },
+
+    /* ===================== BOUTIQUE DO MERCADO · DONA LU ===================== */
+    lu: { start: 'a', nodes: {
+      a: { speaker: 'lu', text: function () {
+        return S.flag('restored') ? 'Oi, meu amor! Boutique do Mercado Modelo: roupa, chapéu, colar e a fitinha do Bonfim. Com o canal de volta, a maquininha quântica aceita seus Créditos de novo!'
+          : 'Oi, meu amor! A maquininha quântica pifou com o Silêncio, mas Crédito Quântico eu anoto no caderninho. Roupa, chapéu, colar e a fitinha do Bonfim: pode provar à vontade.';
+      },
+        choices: [
+          { t: 'Ver roupas e acessórios', close: true, action: function () { AF.Shop.open(); } },
+          { t: 'Qual é a história da fitinha do Bonfim?', next: 'fita' },
+          { t: 'Como ganho mais Créditos Quânticos?', next: 'cq' },
+          { t: 'Até mais, Dona Lu.', close: true }
+        ] },
+      fita: { speaker: 'lu', text: 'A fitinha do Senhor do Bonfim é a lembrança mais famosa de Salvador. Amarra no pulso com três nós, um pedido em cada nó, e deixa ela lá até cair sozinha. Dizem que quem corta antes perde os pedidos!', next: 'a' },
+      cq: { speaker: 'lu', text: 'Pelo que o povo da Afrotech me conta: acertando os testes, vencendo os desafios, explicando a ciência para a vizinhança e fazendo descobertas. E o Terminal Oráculo também mexe com Créditos, viu?', next: 'a' }
+    } },
+
+    /* ===================== VLT DA BAÍA E CASA NA RIBEIRA ===================== */
+    vlt: { start: 'a', nodes: {
+      a: { speaker: 'narrador', redirect: function () {
+        if (AF.World.mapId === 'ribeira') return 'volta';
+        return S.flag('restored') ? 'ida' : 'off';
+      } },
+      off: { speaker: 'narrador', text: 'VLT da Baía — Comércio · Calçada · Bonfim · Ribeira. Painel: "OPERAÇÃO SUSPENSA — a sinalização da linha depende do canal quântico". Um aviso escrito à mão: "Agente, primeiro a missão. Depois, casa."' },
+      ida: { speaker: 'narrador', text: function () {
+        return 'VLT da Baía — Comércio · Água de Meninos · São Joaquim · Calçada · Largo de Roma · Bonfim · Ribeira. Painel: "Próxima partida: agora. Viagem de cerca de 1 minuto pela beira da baía."' + (S.flag('casa') ? '' : ' Depois de um dia desses, a sua casa na beira da praia, na Ribeira, chama.');
+      },
+        choices: [
+          { t: 'Embarcar para casa, na Ribeira', close: true, action: function () { AF.Trip.play('casa'); } },
+          { t: 'Agora não.', close: true }
+        ] },
+      volta: { speaker: 'narrador', text: 'VLT da Baía — sentido Comércio. Painel: "Embarque imediato".',
+        choices: [
+          { t: 'Voltar ao Comércio', close: true, action: function () { AF.Trip.play('casa_volta'); } },
+          { t: 'Ficar em casa mais um pouco.', close: true }
+        ] }
+    } },
+    casa_cama: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: function () {
+        return S.flag('casa') ? 'Sua cama, com a janela aberta para o mar. Estabilidade: {stab}/{max}.'
+          : 'Sua cama. Lençol cheirando a sol, a janela aberta para a Enseada dos Tainheiros e o barulho baixinho das ondas. Depois de salvar o Canal Quântico, você merece.';
+      },
+        choices: [
+          { t: 'Descansar até amanhã', close: true, action: function () { AF.Home.rest(); } },
+          { t: 'Ainda não.', close: true }
+        ] }
+    } },
+    casa_acorda: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: 'Bom dia! O sol entra pela janela e os saveiros já estão na água. Estabilidade restaurada por completo. Da cozinha do vizinho vem cheiro de café; da rua, o sino do VLT.', next: 'b' },
+      b: { speaker: 'oraculo', text: 'Bom dia, agente {name}. Canal quântico: 512 de 512 nós ativos. Salvador funciona — e, por hoje, ninguém precisa de você com urgência. Aproveite a orla.' }
+    } },
+    guardaroupa: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: 'Seu guarda-roupa. Tudo o que você comprou na Boutique do Mercado fica aqui.',
+        choices: [
+          { t: 'Trocar de roupa', close: true, action: function () { AF.Wardrobe.open(); } },
+          { t: 'Fechar o guarda-roupa.', close: true }
+        ] }
+    } },
+    casa_mural: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: function () {
+        var it = [];
+        if (S.flag('restored')) it.push('o recorte do jornal "SALVADOR VOLTA A FALAR"');
+        if (S.flag('miniElevador')) it.push('a Credencial de Operador(a) de Portas');
+        if (S.flag('acarajeQ')) it.push('o papel do acarajé de Dona Cici');
+        if (S.flag('jacobina')) it.push('um bilhete do Hipertrem para Jacobina');
+        if (S.flag('natacao')) it.push('a touca da aula de Mi Ayô');
+        if (S.flag('cruzeiroVista')) it.push('um cartão-postal do Alto do Cruzeiro');
+        if (S.flag('memoria')) it.push('uma carta |?⟩ do jogo do Kauã');
+        if (S.flag('mulheresCiencia')) it.push('uma lista de cientistas escrita pelo Prof. Hohenfeld');
+        return 'Mural de lembranças. Presos com tachinhas: ' + (it.length ? it.join(', ') + '.' : 'por enquanto, só fotos da família.');
+      } }
+    } },
+    casa_radio: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: 'O rádio toca a Rádio Ribeira: ijexá de afoxé, depois samba-reggae, depois um samba de roda do Recôncavo. O locutor avisa que a Lavagem do Bonfim já tem data marcada.' }
+    } },
+    sorvete: { start: 'a', nodes: {
+      a: { speaker: 'narrador', text: 'Sorveteria da orla da Ribeira. Sabores do dia: tapioca, coco, cajá, umbu, mangaba e chocolate. Uma bola: 2 CQ.',
+        choices: [
+          { t: 'Uma bola de tapioca (2 CQ)', if: function () { return S.d.credits >= 2; }, next: 'tomar' },
+          { t: 'Uma bola de cajá (2 CQ)', if: function () { return S.d.credits >= 2; }, next: 'tomar' },
+          { t: 'Só olhar.', close: true }
+        ] },
+      tomar: { speaker: 'narrador', onEnter: function () { if (S.spend(2)) { S.heal(15); AF.Audio.play('cash'); AF.Toast.show('+15 Estabilidade', 'green'); } },
+        text: 'Gelado, doce e com gosto de infância. Você senta no murinho da orla e olha os saveiros.' }
+    } },
+    didi: { start: 'a', nodes: {
+      a: { speaker: 'didi', text: 'Bom dia, vizinho(a)! Quarenta anos remendando rede aqui na Enseada dos Tainheiros. Ouvi dizer que foi você que fez Salvador voltar a falar.',
+        choices: [
+          { t: 'Como o senhor sabe a hora de sair para pescar?', next: 'mare' },
+          { t: 'O senhor confia nessa tecnologia quântica?', next: 'quant' },
+          { t: 'Bom dia, Seu Didi.', close: true }
+        ] },
+      mare: { speaker: 'didi', text: 'Pela maré, ora. A Lua puxa a água do mar, o Sol ajuda, e duas vezes por dia ela enche e duas vezes ela vaza. Tem tábua de maré, mas meu avô sabia só de olhar a Lua.', next: 'a' },
+      quant: { speaker: 'didi', text: 'Eu confio no que eu entendo. Mas, depois que meu neto me explicou que o tal teletransporte não leva peixe nenhum, só informação, eu dormi tranquilo: meu saveiro continua tendo serviço!', next: 'a' }
+    } },
+
     /* ===================== HIPERTREM E JACOBINA ===================== */
     hipertrem: { start: 'a', nodes: {
       a: { speaker: 'narrador', redirect: function () {
@@ -305,14 +516,14 @@
       off: { speaker: 'narrador', text: 'Hipertrem Salvador–Jacobina. Painel: "SERVIÇO SUSPENSO — a sinalização da linha depende do canal quântico". A cápsula do trem dorme sobre o trilho magnético.' },
       ida: { speaker: 'narrador', text: 'Hipertrem Salvador–Jacobina, linha do Piemonte da Diamantina. Painel: "Próxima partida: agora. Viagem de matéria — pessoas e bagagens. Para estados quânticos, use o canal da Afrotech."',
         choices: [
-          { t: 'Embarcar para Jacobina', close: true, action: function () { AF.Game.transition('jacobina', 'chegada'); } },
+          { t: 'Embarcar para Jacobina', close: true, action: function () { AF.Trip.play('jacobina'); } },
           { t: 'Por que o trem demora e o estado da D-7 não?', next: 'ida2' },
           { t: 'Agora não.', close: true }
         ] },
       ida2: { speaker: 'narrador', text: 'Uma placa responde: "O trem leva VOCÊ — matéria, que precisa atravessar os cerca de 300 km. O teletransporte não leva matéria: Jacobina já tinha a sua metade do par emaranhado, e só 2 bits clássicos viajam pela fibra, na velocidade da luz no vidro."', next: 'ida' },
       volta: { speaker: 'narrador', text: 'Hipertrem Jacobina–Salvador. Painel: "Embarque imediato para o Comércio."',
         choices: [
-          { t: 'Voltar para Salvador', close: true, action: function () { AF.Game.transition('praca', 'from_jac'); } },
+          { t: 'Voltar para Salvador', close: true, action: function () { AF.Trip.play('jacobina_volta'); } },
           { t: 'Ficar mais um pouco.', close: true }
         ] }
     } },
@@ -391,7 +602,23 @@
       a: { speaker: 'narrador', text: 'Mina Velha: a boca de uma antiga galeria de ouro, escorada com madeira. Jacobina nasceu da corrida do ouro no período colonial, e o metal ainda sai do subsolo da serra. Um vagonete enferrujado repousa sobre os trilhos.' }
     } },
     jac_cruzeiro: { start: 'a', nodes: {
-      a: { speaker: 'narrador', text: 'Alto do Cruzeiro: um mirante alcançado por mais de 200 degraus. Lá de cima se veem os vales e as serras que cercam Jacobina, no extremo norte da Chapada Diamantina.' }
+      a: { speaker: 'narrador', text: function () {
+        return 'Alto do Cruzeiro: um mirante alcançado por mais de 200 degraus. Lá de cima se veem os vales e as serras que cercam Jacobina, no extremo norte da Chapada Diamantina. Na catraca do mirante: "Ingresso: 20 CQ — a renda mantém a escadaria iluminada". Você tem {cq} CQ.';
+      },
+        choices: [
+          { t: 'Pagar 20 CQ e subir os degraus', if: function () { return S.d.credits >= 20; }, close: true, action: function () {
+            if (!S.spend(20)) return;
+            AF.Audio.play('cash');
+            if (!S.flag('cruzeiroVista')) {
+              S.setFlag('cruzeiroVista');
+              S.addJournal('Mirante do Alto do Cruzeiro', 'Paguei 20 CQ e subi os mais de 200 degraus do Alto do Cruzeiro. Lá de cima: as serras roxas ao entardecer, as luzes de Jacobina ao longo do vale, o Rio do Ouro brilhando e a antena da Estação de Jamal piscando em ciano.');
+            }
+            setTimeout(function () { AF.Panorama.open(); }, 250);
+          } },
+          { t: function () { return 'Subir (faltam ' + Math.max(0, 20 - S.d.credits) + ' CQ)'; }, if: function () { return S.d.credits < 20; }, next: 'pobre' },
+          { t: 'Agora não.', close: true }
+        ] },
+      pobre: { speaker: 'narrador', text: 'A catraca não gira. Créditos Quânticos vêm de testes bem-sucedidos, desafios e descobertas — Jamal, Dona Socorro e Davi têm perguntas para você.' }
     } },
     jac_rio: { start: 'a', nodes: {
       a: { speaker: 'narrador', text: 'Placa: "RIO DO OURO". Foi às margens do Rio do Ouro e do Itapicuru-Mirim que surgiu o arraial que deu origem a Jacobina.' }
@@ -409,6 +636,7 @@
           { t: 'Quer entender o teletransporte da Afrotech?', next: 'app1', if: function () { return S.flag('quizDone') && !S.flag('kauaApp1'); } },
           { t: 'Você tinha uma dúvida sobre emaranhamento…', next: 'app2', if: function () { return S.flag('kauaApp1') && !S.flag('kauaApp2'); } },
           { t: 'O que você sabe do Elevador Lacerda?', next: 'elev' },
+          { t: function () { return S.flag('memoria') ? 'Jogar de novo o Jogo da Memória Quântico' : 'Bora jogar o Jogo da Memória Quântico?'; }, close: true, action: function () { AF.Mini.memoria(); } },
           { t: 'Valeu, Kauã.', close: true }
         ] },
       furt: { speaker: 'kaua', text: 'O sensor do K-7 gira num ciclo fixo. Quem anda pela sombra no momento certo passa batido. O pessoal da Afrotech chama isso de "tunelar" — é só apelido, viu?',
@@ -437,8 +665,10 @@
     } },
 
     k7: { start: 'a', nodes: {
-      a: { speaker: 'k7', redirect: function () { return S.flag('gateOpen') ? 'open' : 'closed'; } },
+      a: { speaker: 'k7', redirect: function () { return S.flag('gateOpen') ? 'open' : (S.flag('miniElevador') ? 'closed' : 'sem_cred'); } },
       open: { speaker: 'k7', text: 'PORTÃO LIBERADO. BOA SORTE, AGENTE {NAME}.' },
+      sem_cred: { speaker: 'k7', text: 'BZZT. TORRE AFROTECH EM PROTOCOLO DE EMERGÊNCIA. CREDENCIAL DE OPERADOR(A) DE PORTAS: NÃO ENCONTRADA. CONCLUA O TREINAMENTO DE PORTAS LÓGICAS NO ELEVADOR LACERDA, AO NORTE DA PRAÇA.',
+        onEnter: function () { AF.Toast.show('Objetivo: treinamento de portas no Elevador Lacerda', 'gold'); } },
       closed: { speaker: 'k7',
         text: function () {
           var n = S.count('k7fails');
@@ -473,8 +703,9 @@
     } },
 
     portao: { start: 'a', nodes: {
-      a: { speaker: 'narrador', redirect: function () { return S.flag('gateOpen') ? 'aberto' : 'b'; } },
+      a: { speaker: 'narrador', redirect: function () { return S.flag('gateOpen') ? 'aberto' : (S.flag('miniElevador') ? 'b' : 'sem_cred'); } },
       aberto: { speaker: 'narrador', text: 'As portas de policarbonato estão abertas. O átrio da Afrotech espera, mergulhado em penumbra azulada.' },
+      sem_cred: { speaker: 'narrador', text: 'As portas de policarbonato estão seladas. Um letreiro pisca: "ACESSO SÓ COM CREDENCIAL DE OPERADOR(A) DE PORTAS — treinamento no Elevador Lacerda".' },
       b: { speaker: 'narrador', text: 'As portas de policarbonato estão seladas. O reconhecimento facial está offline; resta um teclado numérico de backup que exige um código rotativo de criptografia quântica.',
         onEnter: function () { S.unlock('criptografia'); },
         choices: [
@@ -787,19 +1018,23 @@
           { t: 'Ainda não estou pronto(a).', close: true }
         ] },
       fail: { speaker: 'oraculo', text: 'Feedback quântico! A interface rejeitou sua assinatura. Recalibre e tente de novo — pode trocar de abordagem.', next: 'b' },
-      sync: { speaker: 'oraculo', text: 'Interface estável. PROTOCOLO SALVADOR 2495: Etapa 1 — reconstruir o circuito de 3 qubits e validá-lo ao vivo. Etapa 2 — registrar o Relatório de Consultoria para os arquivos da cidade.',
+      sync: { speaker: 'oraculo', text: 'Interface estável. PROTOCOLO SALVADOR 2495: Etapa 1 — reconstruir o circuito de 3 qubits. Etapa 2 — validá-lo ao vivo. Etapa 3 — registrar o Relatório de Consultoria. Entre uma etapa e outra, o Núcleo recalibra os qubits por 1min30s.',
         onEnter: function () { S.setFlag('nucleusSync'); }, next: 'etapas' },
       etapas: { speaker: 'oraculo', text: function () {
+        var NW = AF.NucleoWait;
         if (!S.flag('circuitBuilt')) return 'Status da cidade: aguardando reconstrução do protocolo. Etapa 1: reconstrua o circuito, porta por porta.';
-        if (!S.flag('validated')) return 'Circuito pronto. Falta a validação ao vivo: cinco teletransportes perfeitos seguidos, sem ver a seta.';
-        return 'Validação concluída. Falta o Relatório de Consultoria Afrotech.';
+        if (!NW.ready()) return 'RECALIBRANDO OS QUBITS. O refrigerador volta a 10 mK e os pulsos de micro-ondas são reajustados. Próxima etapa em ' + NW.fmt(NW.remaining()) + '.';
+        if (!S.flag('validated')) return 'Circuito pronto e qubits calibrados. Etapa 2: a validação ao vivo — cinco teletransportes perfeitos seguidos, sem ver a seta.';
+        return 'Validação concluída e Núcleo recalibrado. Etapa 3: o Relatório de Consultoria Afrotech.';
       },
         choices: [
           { t: 'Etapa 1: Reconstruir o circuito', if: function () { return !S.flag('circuitBuilt'); }, close: true,
-            action: function () { AF.Quiz.circuito(function () { AF.Sim.open('final'); }); } },
-          { t: 'Etapa 1: Validação ao vivo (5 teletransportes)', if: function () { return S.flag('circuitBuilt') && !S.flag('validated'); }, close: true,
+            action: function () { AF.Quiz.circuito(function () { AF.NucleoWait.start('validacao'); }); } },
+          { t: function () { return 'Acompanhar a recalibração (' + AF.NucleoWait.fmt(AF.NucleoWait.remaining()) + ')'; }, if: function () { return S.flag('circuitBuilt') && !AF.NucleoWait.ready(); }, close: true,
+            action: function () { AF.NucleoWait.open(); } },
+          { t: 'Etapa 2: Validação ao vivo (5 teletransportes)', if: function () { return S.flag('circuitBuilt') && !S.flag('validated') && AF.NucleoWait.ready(); }, close: true,
             action: function () { AF.Sim.open('final'); } },
-          { t: 'Etapa 2: Relatório de Consultoria', if: function () { return S.flag('validated'); }, close: true,
+          { t: 'Etapa 3: Relatório de Consultoria', if: function () { return S.flag('validated') && AF.NucleoWait.ready(); }, close: true,
             action: function () { AF.Quiz.relatorio(function () { AF.Game.victory(); }); } },
           { t: 'Daqui a pouco.', close: true }
         ] },
@@ -808,6 +1043,26 @@
   };
 
   /* ---------- funções auxiliares ---------- */
+  function swimGo(v) {
+    AF.Swim.start(v);
+    setTimeout(function () { AF.Dialogue.start('miayo_dentro'); }, 250);
+  }
+  /* histórias do Prof. Hohenfeld: marca as ouvidas e dá recompensa ao ouvir quatro de cada baú */
+  function tick(id) { return S.count('hh_' + id) ? '✓ ' : ''; }
+  function heard(id, kind) {
+    if (S.count('hh_' + id)) return;
+    S.d.counters['hh_' + id] = 1;
+    var q = ['planck', 'einstein', 'ondas', 'helgoland', 'epr', 'nobel25'], w = ['curie', 'noether', 'meitner', 'wu', 'hermann', 'nobel_m', 'elisa', 'sonia', 'katemari', 'jaqueline'];
+    var nq = q.filter(function (k) { return S.count('hh_' + k); }).length, nw = w.filter(function (k) { return S.count('hh_' + k); }).length;
+    if (kind === 'q' && nq >= 4 && !S.flag('hohenfeldHist')) {
+      S.setFlag('hohenfeldHist'); S.addCredits(3);
+      S.addJournal('Histórias da mecânica quântica', 'O Prof. Hohenfeld me contou como a quântica nasceu: o "ato de desespero" de Planck (1900), os fótons de Einstein (1905), o átomo de Bohr e as ondas de matéria de de Broglie, Heisenberg em Helgoland e a incerteza (1927), a briga do emaranhamento que virou Nobel (2022) e o circuito do tamanho de uma mão (Nobel de 2025).');
+    }
+    if (kind === 'w' && nw >= 4 && !S.flag('mulheresCiencia')) {
+      S.setFlag('mulheresCiencia'); S.addCredits(3);
+      S.addJournal('Mulheres na ciência', 'Marie Curie, Emmy Noether, Lise Meitner, Chien-Shiung Wu, Grete Hermann; no Brasil, Elisa Frota-Pessôa, Sonia Guimarães, Katemari Rosa e Jaqueline Goes de Jesus. O Prof. Hohenfeld diz que conta essas histórias para que alguém da turma pense: "esse lugar também é meu".');
+    }
+  }
   /* Ao fim da introdução, Dona Cici chama para o minigame do acarajé */
   function ciciChama() {
     if (S.flag('acarajeQ')) return;

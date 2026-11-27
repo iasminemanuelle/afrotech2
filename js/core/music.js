@@ -516,11 +516,13 @@
     /* qual trilha combina com o momento */
     desired: function () {
       var G = AF.Game;
+      if (G && G.mode === 'trip' && AF.Trip && AF.Trip.music) return AF.Trip.music;
       if (!G || G.mode !== 'play') return 'titulo';
       if (this._ending) return 'festa';
       if (this._modal) return 'desafio';
       var W = AF.World, id = W && W.mapId, area = W && W.area && W.area.name;
       if (id === 'jacobina') return 'jacobina';
+      if (id === 'ribeira') return 'praia';
       if (id === 'torre') return area === 'Sala do Computador Quântico' ? 'sala' : 'torre';
       if (id === 'praca' && area === 'Prainha da Baía') return 'praia';
       return 'praca';

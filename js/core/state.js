@@ -17,7 +17,8 @@
 
   /* marcos da missão: guarda o tempo de jogo (s) em que cada um foi alcançado */
   var MILESTONES = ['acarajeQ', 'gateOpen', 'visitedTower', 'metDandara', 'lousaRead', 'quizDone', 'tableDone', 'codeDecoded',
-    'protocolo', 'circuitBuilt', 'validated', 'restored', 'miniElevador', 'miniMercado', 'hohenfeldQuote', 'hohenfeldStory', 'jacobina', 'jacobinaDone'];
+    'protocolo', 'circuitBuilt', 'validated', 'restored', 'miniElevador', 'miniMercado', 'hohenfeldQuote', 'hohenfeldStory', 'jacobina', 'jacobinaDone',
+    'portasClassicas', 'memoria', 'loja', 'natacao', 'hohenfeldHist', 'mulheresCiencia', 'casa', 'cruzeiroVista'];
   AF.MILESTONES = MILESTONES;
   AF.Bus.on('flags', function (k) {
     var d = AF.State.d;
@@ -51,6 +52,9 @@
         stats: { rolls: 0, successes: 0, fails: 0, ruido: 0, simRounds: 0, simCorrect: 0,
                  quizErrors: 0, playTime: 0, decoherences: 0 },
         student: { nome: '', turma: '' },
+        wardrobe: { owned: [], eq: {} },
+        swim: null,
+        timers: {},
         res: newRes()
       };
       this.d.stability = this.maxStability();
@@ -83,6 +87,12 @@
       AF.Bus.emit('hud');
     },
 
+    /* aparência atual: ficha + roupas compradas (+ traje de banho) */
+    spec: function () { return AF.Chars.playerSpec(this.d.look, this.d.wardrobe && this.d.wardrobe.eq, this.d.swim ? { swim: this.d.swim } : null); },
+    spend: function (n) {
+      if (this.d.credits < n) return false;
+      this.d.credits -= n; AF.Bus.emit('hud'); return true;
+    },
     flag: function (k) { return !!(this.d && this.d.flags[k]); },
     setFlag: function (k, v) {
       this.d.flags[k] = (v === undefined) ? true : v;
@@ -154,6 +164,10 @@
         d.simHistogram = d.simHistogram || { '00': 0, '01': 0, '10': 0, '11': 0 };
         d.student = d.student || { nome: '', turma: '' };
         d.res = d.res || newRes();
+        d.wardrobe = d.wardrobe || { owned: [], eq: {} };
+        d.timers = d.timers || {};
+        d.swim = null;
+        d.look = Object.assign({}, AF.LOOK_DEFAULT, d.look || {});
         this.d = d;
         return true;
       } catch (e) { return false; }

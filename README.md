@@ -99,9 +99,9 @@ sociointeracionista em RPG* (MNPEF/UNEB). A missão é organizada pelos Três Mo
 
 | Momento | No jogo | O que o(a) estudante faz |
 |---|---|---|
-| **Problematização Inicial** (Atos 1–2) | Tabuleiro de Dona Cici, Praça Cairu, bloqueio de emergência, Labirinto do Silêncio, Interface com o Núcleo, gabinete de Dandara | Começa com o minigame **"Tem ou não tem pimenta?"** (o acarajé de Schrödinger). Depois levanta **hipóteses** para as 4 perguntas da lousa — sem certo nem errado. Dandara responde com novas perguntas, não com respostas. |
+| **Problematização Inicial** (Atos 1–2) | Tabuleiro de Dona Cici, Elevador Lacerda, Praça Cairu, bloqueio de emergência, Labirinto do Silêncio, Interface com o Núcleo, gabinete de Dandara | Começa com o minigame **"Tem ou não tem pimenta?"** (o acarajé de Schrödinger) e o **treinamento de portas lógicas** no Elevador Lacerda (clássicas e quânticas), que dá a credencial exigida pelo drone do portão. Depois levanta **hipóteses** para as 4 perguntas da lousa — sem certo nem errado. Dandara responde com novas perguntas, não com respostas. |
 | **Organização do Conhecimento** (Ato 3) | Laboratório de Teoria Quântica | Aula da Prof.ª Iasmin (superposição, medição, emaranhamento, teletransporte), dúvidas, quiz, **Roteiro de Operação** no simulador e **Decifrando o Código**. |
-| **Aplicação do Conhecimento** (Ato 4 e Comércio) | Sala do Computador Quântico (Núcleo) | Reconstrói o **circuito de 3 qubits** porta por porta, valida o protocolo ao vivo, monta o **Relatório de Consultoria** (as 4 perguntas do vídeo) e explica o teletransporte para Dona Cici e Kauã. |
+| **Aplicação do Conhecimento** (Ato 4 e Comércio) | Sala do Computador Quântico (Núcleo) | Reconstrói o **circuito de 3 qubits** porta por porta, valida o protocolo ao vivo, monta o **Relatório de Consultoria** (as 4 perguntas do vídeo) e explica o teletransporte para Dona Cici e Kauã. Entre as três etapas do protocolo, o Núcleo **recalibra os qubits por 1min30s** (dá para explorar enquanto isso; o tempo fica em `AF.CONFIG.NUCLEO_WAIT`). |
 
 No final, a **transmissão do Oráculo** compara as hipóteses iniciais com o que a física mostrou e
 lembra as tarefas fora do jogo: montar o circuito no **IBM Quantum Composer** e gravar o **vídeo de 3 a 5 minutos**.
@@ -141,12 +141,27 @@ vibrações e campos magnéticos para não perder os estados quânticos (decoer�
 
 Para entrar na sala no Ato 4, é preciso ter completado a tabela no simulador e cumprir o protocolo no painel de acesso.
 
+### Novidades da v0.8
+
+| O quê | Onde | Como funciona |
+|---|---|---|
+| **Portas lógicas antes da Torre** | Elevador Lacerda | Parte 1: o painel do elevador antigo, com tabela-verdade — NOT (lâmpada "cabine fora"), AND (trava de segurança), OR (chamada) e XOR (interruptor de escada, que é o que a CNOT faz no 2º qubit). Parte 2: o Elevador de Hadamard (X, H, Z, interferência e fase). Só com a **Credencial de Operador(a) de Portas** o drone K-7 libera o portão. |
+| **Ficha com mais diversidade** | Criação do personagem (abas Corpo · Cabelo e rosto · Roupa) | 10 tons de pele; porte padrão ou largo; sardas ou vitiligo; aparelho auditivo, braço biônico e bengala-guia; 13 cabelos (black power, puffs, cacheado, locs, box braids, trança nagô, coque, liso, degradê, moicano, raspado, careca, turbante) em 9 cores; barba, bigode ou cavanhaque; óculos; 6 roupas, 8 cores de roupa, 5 de calça e 6 neons. Botão "Sortear visual". |
+| **Boutique do Mercado** | Dona Lu, em frente ao Mercado Modelo | 17 roupas e acessórios pagos com Créditos Quânticos (fitinha do Bonfim, colares de miçangas e búzios, boné, chapéu de palha, panamá, torço, fone, óculos escuros, visor, camiseta de bloco afro, bata, abadá, vestido de chita, bata kente, kit de surfe, jaqueta neon). Provador grátis; o que é comprado fica no guarda-roupa de casa. |
+| **Casa na Ribeira** | VLT da Baía, na avenida da praça (depois da missão) | O(a) agente embarca e o caminho passa pela janela por **1 minuto**: Comércio, Água de Meninos, Feira de São Joaquim, Calçada, Largo de Roma (Santa Dulce dos Pobres), Colina do Bonfim e Ribeira. A casa fica na beira da praia: cama (descansar restaura a Estabilidade), guarda-roupa, mural de lembranças, rádio, sorveteria da orla e Seu Didi, pescador. A volta dura 20 s. |
+| **Viagem a Jacobina** | Hipertrem | Embarque e percurso de **10 segundos** (Salvador, Recôncavo, Feira de Santana, sertão, serras de Jacobina), dia virando noite. A volta também é animada. Depois da primeira vez, as viagens podem ser puladas. |
+| **Mirante do Alto do Cruzeiro** | Jacobina | Custa **20 CQ**: mostra a paisagem das serras ao entardecer, as luzes da cidade, o Rio do Ouro e a antena da estação de Jamal. |
+| **Prof. Hohenfeld surfista** | Prainha da Baía | Lycra e bermuda de surfe, cabelo e cavanhaque pretos, prancha na areia. Novos baús de histórias: **mecânica quântica** (Planck, Einstein, Bohr e de Broglie, Heisenberg e a incerteza, o emaranhamento até o Nobel de 2022, o circuito do Nobel de 2025) e **mulheres na ciência** (Marie Curie, Emmy Noether, Lise Meitner, Chien-Shiung Wu, Grete Hermann, as cinco mulheres do Nobel de Física; no Brasil e na Bahia: Elisa Frota-Pessôa, Sonia Guimarães, Katemari Rosa e Jaqueline Goes de Jesus). |
+| **Aula de natação** | Prainha da Baía, com **Mi Ayô** | Alunos de touca nadam no mar; Mi Ayô convida todo mundo. Quem aceita escolhe o traje (maiô, sunga ou bermuda e camisa de lycra), ganha touca e óculos, entra na água e nada até as três boias. Ao sair da praia, a roupa volta ao normal. |
+| **Jogo da Memória Quântico** | Kauã, no centro da praça | 8 pares (\|0⟩, \|1⟩, X, H, Z, CNOT, medição, decoerência). Carta virada para baixo está em \|?⟩; virar é medir; um par está **emaranhado**: medir uma carta acende a parceira. |
+| **Efeitos sonoros** | Todo o jogo | Passos que mudam com o chão (pedra, areia, madeira, metal, terra, água), "voz" própria de cada personagem nos diálogos e portas que abrem e fecham (pneumáticas na Torre, de madeira em casa, do VLT e do Hipertrem). |
+
 ### Minigames e a Prainha da Baía (v0.4)
 
 | Onde e quando | Minigame | Analogia com a missão |
 |---|---|---|
 | **Tabuleiro de Dona Cici** · início da missão (Dona Cici chama logo depois da introdução; também pelo diálogo com ela) | **Tem ou não tem pimenta? — o Acarajé de Schrödinger.** 1) Aposte "quente" ou "frio" antes de abrir o papel (3 rodadas; abrir de novo confirma o mesmo resultado). 2) Ajuste o botão da pimenteira para atender os pedidos "1 em cada 4 quentes" e "3 em cada 4" e frite 20 acarajés. 3) Duas perguntas sobre o gato. | Superposição (não é "meio apimentado" nem ignorância), medição/colapso, **regra de Born** (amplitude 0,5 → 25%) e os limites da analogia: um acarajé de verdade, como o gato, perde a superposição na hora (decoerência). |
-| **Elevador Lacerda** · liberado depois de restaurar o canal | **Elevador de Hadamard.** Cidade Baixa = \|0⟩, Cidade Alta = \|1⟩. Monte sequências de portas X, H e Z e envie 20 passageiros. 5 desafios: X; H (50/50); **H·H** com previsão (interferência); só H e Z para subir (**H·Z·H = X**); e uma cabine que "chegou de Jacobina" em (\|0⟩ − \|1⟩)/√2. | As portas e a **fase** das correções de Jamal; interferência; a seta das amplitudes num círculo (horizontal = Baixa, vertical = Alta). |
+| **Elevador Lacerda** · antes da Torre (desde a v0.8) | **Elevador de Hadamard.** Cidade Baixa = \|0⟩, Cidade Alta = \|1⟩. Monte sequências de portas X, H e Z e envie 20 passageiros. 5 desafios: X; H (50/50); **H·H** com previsão (interferência); só H e Z para subir (**H·Z·H = X**); e uma cabine que "chegou de Jacobina" em (\|0⟩ − \|1⟩)/√2. | As portas e a **fase** das correções de Jamal; interferência; a seta das amplitudes num círculo (horizontal = Baixa, vertical = Alta). |
 | **Mercado Modelo** · liberado depois de restaurar o canal (Dona Zeza aparece na porta) | **Gincana das Fitinhas** — o desafio de Bell (jogo CHSH). Dona Zeza (Salvador) e Jamal (Jacobina) recebem fitinhas Amarela ou Verde e respondem SIM/NÃO sem se comunicar. 1) Combinado clássico: no máximo 75%. 2) Fitinhas emaranhadas: escolha os ângulos de medição e passe de 80% (ótimo: 0°/45° e 22,5°/−22,5° ≈ 85%). 3) "Isso é telefone?" | Emaranhamento, desigualdade de Bell, Nobel de 2022 e **não-sinalização**: as respostas de cada lado, sozinhas, são 50/50 — por isso o teletransporte precisa do canal clássico. |
 
 **Prainha da Baía:** o mapa da praça foi estendido para o sul. Desça a **Rampa do Mercado** (escadaria ao lado do
@@ -313,7 +328,7 @@ afrotech-vol2/
     │   ├── tiles.js        ← calçada portuguesa, paralelepípedo, baía, escarpa, pisos da Torre
     │   └── art.js          ← Cidade Alta, Elevador Lacerda, Torre, Mercado, sala blindada, refrigerador de diluição…
     ├── world/
-    │   ├── maps.js         ← Praça Cairu (Comércio) e interior da Torre
+    │   ├── maps.js         ← Praça Cairu (Comércio) com a Prainha, Torre, Jacobina e Ribeira
     │   └── world.js        ← colisão, câmera, NPCs, interação, luz neon, zona escura, partículas
     ├── systems/
     │   ├── dice.js         ← teste de 2d6 animado
@@ -321,7 +336,7 @@ afrotech-vol2/
     ├── content/
     │   ├── dialogues.js    ← roteiro de todos os NPCs e terminais
     │   ├── quiz.js         ← hipóteses da lousa, quiz, Decifrando o Código, circuito e relatório
-    │   └── glossary.js     ← Glossário Quântico (31 conceitos)
+    │   └── glossary.js     ← Glossário Quântico (33 conceitos)
     ├── quantum/
     │   ├── qsim.js         ← simulador de vetor de estado (H, X, Z, CNOT, medição)
     │   └── bloch.js        ← esfera de Bloch e rotações
@@ -329,10 +344,13 @@ afrotech-vol2/
     │   ├── ui.js           ← modais, notificações, efeitos de tela
     │   ├── hud.js          ← faixa do HUD fora da cena (status, objetivo, atalhos) e balão "E · Interagir"
     │   ├── panel.js        ← Ficha, Diário, Glossário, Testes, pausa, controles
+    │   ├── shop.js         ← Boutique do Mercado (comprar) e guarda-roupa (trocar)
+    │   ├── trip.js         ← viagens animadas: VLT até a Ribeira e Hipertrem até Jacobina
+    │   ├── extras.js       ← natação, mirante do Cruzeiro, recalibração do Núcleo, descanso em casa
     │   ├── quiz.js         ← motor de perguntas + circuito de 3 qubits desenhado por etapas
     │   ├── lousa.js        ← lousa de Dandara (hipóteses) e Roteiro de Operação
     │   ├── simulator.js    ← Simulador de Teletransporte (treino e desafio final)
-    │   ├── minigames.js    ← Acarajé de Schrödinger, Elevador de Hadamard, Gincana das Fitinhas, Recepção em Jacobina
+    │   ├── minigames.js    ← Acarajé de Schrödinger, portas lógicas e Elevador de Hadamard, Gincana das Fitinhas, Recepção em Jacobina, Memória Quântica
     │   ├── report.js       ← modo professor(a): relatório do estudante (código/arquivo) e painel da turma
     │   ├── create.js       ← tela inicial e criação de ficha
     │   └── touch.js        ← joystick, botão E, atalhos de toque, tela cheia

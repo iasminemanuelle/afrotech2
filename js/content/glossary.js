@@ -85,6 +85,10 @@
     brasil: { term: 'Quântica no Brasil',
       def: '2025 foi o Ano Internacional da Ciência e Tecnologia Quânticas. Em Salvador, o CIMATEC Quantum (inaugurado em 2024) testa criptografia quântica; o SENAI-SP recebeu em 2023 um computador quântico educacional de 3 qubits.',
       game: 'A Afrotech de 2495 é ficção — mas suas sementes são reais e baianas.' },
+    portas_logicas: { term: 'Portas lógicas clássicas',
+      def: 'Circuitos que transformam bits (0 ou 1). NOT inverte; AND dá 1 só se as duas entradas forem 1; OR dá 1 se pelo menos uma for 1; XOR dá 1 quando as entradas são diferentes. As portas quânticas generalizam essa ideia: X é o NOT quântico e a CNOT faz o XOR no segundo qubit — mas a porta H não tem equivalente clássico.' },
+    tunelamento_macro: { term: 'Tunelamento quântico macroscópico',
+      def: 'Efeito quântico observado em um circuito elétrico supercondutor grande o bastante para segurar na mão: a corrente "atravessa" uma barreira de energia e o circuito só aceita níveis de energia quantizados. Os experimentos de John Clarke, Michel Devoret e John Martinis (1984–1985) renderam o Nobel de Física de 2025 e são a base dos qubits supercondutores.' },
     isolamento: { term: 'Isolamento do computador quântico',
       def: 'Muitos processadores quânticos (os de qubits supercondutores, por exemplo) funcionam a cerca de 10 milikelvin (−273,14 °C), dentro de um refrigerador de diluição, numa sala com piso isolado de vibrações e paredes que blindam campos magnéticos (mu-metal) e ondas de rádio (gaiola de Faraday). Compressores e eletrônica de controle ficam do lado de fora. Tudo para evitar a decoerência. Outras tecnologias, como íons presos e fótons, usam outras formas de isolamento.',
       game: 'O Núcleo da Afrotech tem uma sala só para ele, com antecâmara, armário para metais e ímãs e um protocolo de entrada.' },
@@ -102,8 +106,8 @@
       game: 'É a tabela que você reconstruiu para encerrar o Silêncio.' }
   };
 
-  AF.GLOSS_ORDER = ['bit', 'canal_classico', 'qubit', 'superposicao', 'medicao', 'regra_born', 'gato_schrodinger', 'interpretacoes', 'spin',
+  AF.GLOSS_ORDER = ['bit', 'portas_logicas', 'canal_classico', 'qubit', 'superposicao', 'medicao', 'regra_born', 'gato_schrodinger', 'interpretacoes', 'spin',
     'emaranhamento', 'par_bell', 'epr_bell', 'chsh', 'nao_clonagem', 'teletransporte', 'circuito', 'porta_h', 'cnot',
-    'porta_x', 'porta_z', 'bloch', 'fase_global', 'fidelidade', 'decoerencia', 'isolamento', 'interferencia', 'grover',
+    'porta_x', 'porta_z', 'bloch', 'fase_global', 'fidelidade', 'decoerencia', 'isolamento', 'tunelamento_macro', 'interferencia', 'grover',
     'tunelamento', 'criptografia', 'brasil', 'protocolo'];
 })(window.AF);

@@ -317,3 +317,11 @@ body.touch .modal-rep, body.touch .modal-tch { width: 100%; height: 100%; }
 body.touch .tch, body.touch .rep { font-size: 18px; }
 body.touch .rep-form input { font-size: 20px; }
 body.touch .tch h3 { font-size: 21px; }
+
+body.touch .c-look-tabs button { font-size: 17px; padding: 4px 2px; }
+body.touch .c-look .swatch { width: 32px; height: 28px; }
+body.touch .mem-card { height: 70px; font-size: 16px; }
+body.touch #trip-ui .trip-cap { font-size: 18px; }
+/* viagens no celular em pé: a legenda vai para a área dos controles, sem cobrir a cena */
+body.touch.portrait #trip-ui { position: fixed; bottom: calc(var(--deck) * 0.3); z-index: 30; }
+body.touch.portrait #trip-skip { top: -44px; }

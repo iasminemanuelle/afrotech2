@@ -324,10 +324,10 @@
         this.phase = 'won';
         S.setFlag('validated');
         S.addJournal('Validação ao vivo', 'Cinco teletransportes perfeitos seguidos, sem ver a seta: o protocolo foi validado no Núcleo.');
-        this.narr(msg + '<div class="sim-done">PROTOCOLO VALIDADO! Agora, a Etapa 2: o Relatório de Consultoria Afrotech.</div>');
+        this.narr(msg + '<div class="sim-done">PROTOCOLO VALIDADO! O Núcleo recalibra por ' + AF.NucleoWait.fmt(AF.CONFIG.NUCLEO_WAIT) + ' antes da última etapa: o Relatório de Consultoria Afrotech.</div>');
         AF.Audio.play('victory');
         var self = this, tok = this.token;
-        setTimeout(function () { if (tok !== self.token) return; self.m.close(true); AF.Quiz.relatorio(function () { AF.Game.victory(); }); }, 2400);
+        setTimeout(function () { if (tok !== self.token) return; self.m.close(true); AF.NucleoWait.start('relatorio'); }, 2400);
         return;
       }
       this.phase = 'done';

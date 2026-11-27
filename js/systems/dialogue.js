@@ -19,13 +19,14 @@
       .replace(/\{max\}/g, S.maxStability())
       .replace(/\{cq\}/g, S.d.credits)
       .replace(/\{cost\}/g, AF.oracleCost())
-      .replace(/\{table\}/g, S.tableProgress());
+      .replace(/\{table\}/g, S.tableProgress())
+      .replace(/\{boias\}/g, AF.World && AF.World.buoys ? Object.keys(AF.World.buoys).length : 0);
   }
   AF.subst = subst;
 
   function portraitFor(sp) {
     if (!sp) return null;
-    if (sp.player) return AF.Chars.portrait(AF.Chars.playerSpec(S.d.look));
+    if (sp.player) return AF.Chars.portrait(S.spec());
     if (sp.spec) {
       if (!portraitCache[sp.spec]) portraitCache[sp.spec] = AF.Chars.portrait(AF.SPECS[sp.spec]);
       return portraitCache[sp.spec];
@@ -64,6 +65,7 @@
       if (!this.active) return;
 
       var sp = AF.SPEAKERS[n.speaker] || AF.SPEAKERS.narrador;
+      this.voice = n.speaker || 'narrador';
       var pc = portraitFor(sp);
       var pbox = $('dlg-portrait-box');
       if (pc) {
@@ -89,7 +91,7 @@
       var now = Math.floor(this.shown);
       if (now !== before) {
         $('dlg-text').textContent = this.full.slice(0, now);
-        if (now % 3 === 0) AF.Audio.play('blip');
+        if (now % 3 === 0 && /\S/.test(this.full.charAt(now - 1))) AF.Audio.talk(this.voice);
       }
       if (this.shown >= this.full.length) this.finishTyping();
     },
@@ -123,7 +125,7 @@
           chip = '<span class="chip ' + (locked ? 'chip-lock' : 'chip-req') + '">' + (locked ? 'REQUER ' : '') +
                  AF.ATTR_BY_ID[c.req.attr].name.toUpperCase() + ' ' + c.req.min + '</span>';
         }
-        b.innerHTML = '<span class="num">' + (c.auto ? '▶' : (i + 1)) + '</span>' + chip + '<span class="ct">' + AF.esc(subst(c.t)) + '</span>';
+        b.innerHTML = '<span class="num">' + (c.auto ? '▶' : (i + 1)) + '</span>' + chip + '<span class="ct">' + AF.esc(subst(typeof c.t === 'function' ? c.t(S) : c.t)) + '</span>';
         if (locked) { b.classList.add('locked'); b.title = 'Requer ' + AF.ATTR_BY_ID[c.req.attr].name + ' ' + c.req.min; }
         b.addEventListener('click', function () { self.choose(i); });
         b.addEventListener('mouseenter', function () { self.select(i); });
@@ -155,7 +157,7 @@
         $('dlg-choices').innerHTML = '';
         var dc = typeof c.test.dc === 'function' ? c.test.dc(S) : c.test.dc;
         var bonus = AF.Dialogue.testBonus(c.test);
-        AF.Dice.roll({ attr: c.test.attr, dc: dc, bonus: bonus, label: subst(c.t) }).then(function (r) {
+        AF.Dice.roll({ attr: c.test.attr, dc: dc, bonus: bonus, label: subst(typeof c.t === 'function' ? c.t(S) : c.t) }).then(function (r) {
           self.busy = false;
           if (!r.success && c.test.ruido) S.damage(c.test.ruido + (r.crit === 'fail' ? 4 : 0), c.test.reason);
           if (r.success) S.addCredits(1, true);

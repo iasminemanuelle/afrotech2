@@ -296,6 +296,44 @@
         return r() < 0.12 ? P.shade(c, -10) : c;
       });
     },
+    /* casa colorida da Ribeira: parede de reboco pintado, rodapé e azulejo */
+    casa_face: function (v) {
+      var r = P.rng(1313 + v * 7);
+      var c = '#e8a838';                                                                              /* amarelo-ouro, como os casarões */
+      return P.field(T, T, function (x, y) {
+        if (y === 0) return '#f2eee0';
+        if (y === 1) return P.shade(c, -26);
+        if (y >= 13) return y === 13 ? '#f2eee0' : (((x >> 2) + (y & 1)) % 2 ? '#2a5aa0' : '#e8ecf6');    /* barrado de azulejo */
+        if (v === 1 && x >= 4 && x <= 11 && y >= 4 && y <= 10) {                                       /* janela de madeira */
+          if (x === 4 || x === 11 || y === 4 || y === 10) return '#f2eee0';
+          return (x === 7 || x === 8) ? '#5a3a24' : (y % 2 ? '#7a5034' : '#6a4228');
+        }
+        return r() < 0.08 ? P.shade(c, -10) : (r() < 0.05 ? P.shade(c, 12) : c);
+      });
+    },
+    casa_top: function () {
+      return P.field(T, T, function (x, y) {
+        var row = y >> 2;
+        if ((y & 3) === 3) return '#6a2a1a';
+        return ((x + row * 2) % 6 === 0) ? '#8a3a22' : '#b0502e';                                     /* telhado de barro */
+      });
+    },
+    piso_casa: function (v) {
+      var r = P.rng(1414 + v);
+      return P.field(T, T, function (x, y) {
+        var a = ((x >> 3) + (y >> 3)) % 2;
+        if (x % 8 === 0 || y % 8 === 0) return '#8a3a2a';
+        var c = a ? '#c8603e' : '#b45436';                                                           /* lajota vermelha */
+        return r() < 0.06 ? P.shade(c, -12) : c;
+      });
+    },
+    porta_casa: function () {
+      return P.field(T, T, function (x, y) {
+        if (x <= 1 || x >= 14) return '#5a3a24';
+        if (y <= 1) return '#5a3a24';
+        return (y % 4 === 0) ? '#8a5a34' : '#a06a3e';
+      });
+    },
     nucleo: function (frame) {
       return P.field(T, T, function (x, y) {
         var onGrid = x % 8 === 0 || y % 8 === 0;
@@ -333,7 +371,7 @@
     }
   };
 
-  var VARIANTS = { calcada: 4, cobble: 4, asphalt: 4, seawall: 2, cliff: 6, wall_face: 3, floor: 4, lab: 2, wood: 4, sand: 4, quay: 2, terra: 4, grama: 4, trilha: 2, shield_face: 2, iso: 2 };
+  var VARIANTS = { casa_face: 2, piso_casa: 2, calcada: 4, cobble: 4, asphalt: 4, seawall: 2, cliff: 6, wall_face: 3, floor: 4, lab: 2, wood: 4, sand: 4, quay: 2, terra: 4, grama: 4, trilha: 2, shield_face: 2, iso: 2 };
   var FRAMES = { water: 4, nucleo: 4, ruido: 4, field: 4, foam: 4, foam_r: 4 };
 
   AF.Tiles = {

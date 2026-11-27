@@ -95,6 +95,27 @@
     B: { tile: 'shield', solid: true }, q: { tile: 'iso' }, O: { tile: 'porta' }
   };
 
+  /* --------------------------- RIBEIRA --------------------------- */
+  function buildRibeira() {
+    var W = 32, H = 24, g = grid(W, H, 'g');
+    fill(g, 0, 0, W, 3, 'X');
+    fill(g, 0, 3, W, 1, '.'); fill(g, 0, 4, W, 1, 'a'); fill(g, 0, 5, W, 1, '='); fill(g, 0, 6, W, 1, 'a'); fill(g, 0, 7, W, 1, '.');
+    /* casa: telhado (8), parede com janelas (9), cômodo (10–13), fachada com porta (14) */
+    fill(g, 3, 8, 12, 2, 'H'); fill(g, 3, 10, 1, 4, 'H'); fill(g, 14, 10, 1, 4, 'H'); fill(g, 3, 14, 12, 1, 'H');
+    fill(g, 4, 10, 10, 4, 'p');
+    g[9][5] = 'J'; g[9][12] = 'J'; g[14][5] = 'J'; g[14][12] = 'J';
+    fill(g, 8, 14, 2, 1, 'D');
+    fill(g, 0, 15, W, 1, '.'); fill(g, 8, 8, 0, 0, '.');
+    fill(g, 0, 17, W, 2, 's'); fill(g, 0, 19, W, 1, 'f'); fill(g, 0, 20, W, 4, '~');
+    return g;
+  }
+  var LEG_RIB = {
+    X: { tile: 'seawall', solid: true }, '.': { tile: 'calcada' }, a: { tile: 'asphalt' }, '=': { tile: 'lane' },
+    g: { tile: 'grama' }, H: { tile: 'casa', solid: true, v: 0 }, J: { tile: 'casa', solid: true, v: 1 },
+    p: { tile: 'piso_casa' }, D: { tile: 'porta_casa' }, s: { tile: 'sand' },
+    f: { tile: 'foam', anim: true, solid: true }, '~': { tile: 'water', solid: true, anim: true }
+  };
+
   /* --------------------------- JACOBINA --------------------------- */
   function buildJacobina() {
     var W = 36, H = 26, g = grid(W, H, 't');
@@ -166,8 +187,17 @@
         { art: 'palm', x: 6, y: 31, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] },
         { art: 'palm', x: 21, y: 31, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] },
         lamp(7, 24), lamp(15, 24),
-        { art: 'placa_praia', x: 6, y: 21, w: 2, h: 1, hit: [14, 10, 6, 6] }
+        { art: 'placa_praia', x: 6, y: 21, w: 2, h: 1, hit: [14, 10, 6, 6] },
+        /* ---- v0.8: prancha do professor, boias da aula de natação, boutique e VLT ---- */
+        { art: 'prancha', x: 14, y: 27, w: 1, h: 1, hit: [3, 24, 6, 6], interact: 'prancha', label: 'Prancha do professor' },
+        { art: 'boia', x: 5, y: 35, w: 1, h: 1, solid: false, buoy: 1 },
+        { art: 'boia', x: 13, y: 37, w: 1, h: 1, solid: false, buoy: 2 },
+        { art: 'boia', x: 23, y: 36, w: 1, h: 1, solid: false, buoy: 3 },
+        { art: 'arara', x: 2, y: 18, w: 2, h: 1, hit: [0, 24, 34, 6], interact: 'lu', label: 'Boutique do Mercado' },
+        { art: 'vlt', x: 15, y: 18, w: 6, h: 2, hit: [0, 30, 96, 16], interact: 'vlt', label: 'VLT da Baía (Ribeira)',
+          lights: [{ ox: 48, oy: 24, r: 46, c: function () { return S.flag('restored') ? '255,201,64' : '255,60,90'; }, a: 0.2 }] }
       ],
+      swimZone: { x: 0, y: 33, w: 28, h: 7 },
       areas: [
         { x: 0, y: 23, w: 40, h: 17, name: 'Prainha da Baía', sub: 'Baía de Todos-os-Santos · Forte São Marcelo ao fundo',
           onEnter: function () {
@@ -182,7 +212,15 @@
         { id: 'zeza', spec: 'zeza', x: 6.5, y: 18.6, dir: 'down', interact: 'mercado', label: 'Dona Zeza (Gincana)', cond: function () { return S.flag('restored'); } },
         { id: 'hohenfeld', spec: 'hohenfeld', x: 11.4, y: 28.9, dir: 'down', interact: 'hohenfeld', label: 'Prof. Hohenfeld' },
         { id: 'aluna', spec: 'aluna', x: 9.3, y: 30.4, dir: 'up', interact: 'alunos', label: 'Estudante' },
-        { id: 'aluno', spec: 'aluno', x: 13.6, y: 30.5, dir: 'up', interact: 'alunos', label: 'Estudante' }
+        { id: 'aluno', spec: 'aluno', x: 13.6, y: 30.5, dir: 'up', interact: 'alunos', label: 'Estudante' },
+        { id: 'miayo', spec: 'miayo', x: 22.5, y: 31.7, dir: 'down', interact: 'miayo', label: 'Mi Ayô (aula de natação)' },
+        { id: 'lu', spec: 'lu', x: 1.2, y: 19.9, dir: 'right', interact: 'lu', label: 'Dona Lu (Boutique)' },
+        /* aula de natação: alunos de touca nadando de um lado para o outro */
+        { id: 'nad1', kind: 'swimmer', x: 4, y: 35.4, x0: 2, x1: 11, speed: 13, cap: '#ffc940', skin: '#4a2a1c' },
+        { id: 'nad2', kind: 'swimmer', x: 15, y: 36.5, x0: 9, x1: 19, speed: -11, cap: '#ff3fa4', skin: '#9a6646' },
+        { id: 'nad3', kind: 'swimmer', x: 6, y: 38.2, x0: 2, x1: 12, speed: 9, cap: '#3dff9a', skin: '#6e4230' },
+        { id: 'nad4', kind: 'swimmer', x: 22, y: 37.6, x0: 17, x1: 26, speed: -12, cap: '#f2f0f8', skin: '#3a2014' },
+        { id: 'nad5', kind: 'swimmer', x: 12, y: 39.2, x0: 6, x1: 24, speed: 15, cap: '#3aa0ff', skin: '#d2a07a' }
       ],
       portals: [
         { x: 30, y: 14, w: 4, h: 1, to: 'torre', spawn: 'entrada', facing: 'up', cond: function () { return S.flag('gateOpen'); } }
@@ -192,7 +230,51 @@
         from_torre: { x: 31.9, y: 15.2, dir: 'down' },
         oraculo: { x: 14.5, y: 9.9, dir: 'up' },
         praia: { x: 11.4, y: 30.6, dir: 'up' },
+        from_vlt: { x: 18, y: 20.7, dir: 'down' },
+        natacao: { x: 21.5, y: 32.6, dir: 'down' },
         from_jac: { x: 36.5, y: 17.6, dir: 'down' }
+      }
+    },
+
+    ribeira: {
+      name: 'Ribeira — Beira da Praia', sub: 'Península de Itapagipe · Enseada dos Tainheiros',
+      build: buildRibeira, legend: LEG_RIB,
+      ambient: 'rgba(70,24,50,0.16)',
+      particles: 'dust',
+      props: [
+        { art: 'ribeira_sky', x: 0, y: 0, w: 32, h: 3 },
+        { art: 'vlt', x: 22, y: 5, w: 6, h: 2, hit: [0, 30, 96, 16], interact: 'vlt', label: 'VLT da Baía (Comércio)',
+          lights: [{ ox: 48, oy: 24, r: 46, c: '255,201,64', a: 0.2 }] },
+        { art: 'cama', x: 4, y: 10, w: 2, h: 1, hit: [0, 8, 30, 16], interact: 'casa_cama', label: 'Cama (descansar)' },
+        { art: 'guardaroupa', x: 12, y: 10, w: 2, h: 1, ox: -4, hit: [0, 20, 24, 12], interact: 'guardaroupa', label: 'Guarda-roupa' },
+        { art: 'mural', x: 7, y: 9, w: 2, h: 1, solid: false, interact: 'casa_mural', label: 'Mural de lembranças' },
+        { art: 'rug', x: 7, y: 11, w: 3, h: 2, ground: true, solid: false },
+        { art: 'mesa_casa', x: 10, y: 12, w: 2, h: 1, hit: [0, 8, 28, 10], interact: 'casa_radio', label: 'Rádio' },
+        { art: 'plant', x: 4, y: 13, w: 1, h: 1 },
+        { art: 'sorveteria', x: 17, y: 15, w: 2, h: 1, hit: [4, 18, 24, 14], interact: 'sorvete', label: 'Sorveteria da orla' },
+        { art: 'placa_ribeira', x: 26, y: 15, w: 4, h: 1, hit: [28, 22, 4, 8] },
+        { art: 'saveiro', x: 6, y: 21, w: 3, h: 2, solid: false },
+        { art: 'saveiro', x: 21, y: 22, w: 3, h: 2, solid: false },
+        { art: 'palm', x: 1, y: 16, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] },
+        { art: 'palm', x: 15, y: 16, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] },
+        { art: 'palm', x: 30, y: 16, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] },
+        lamp(2, 7), lamp(12, 7), lamp(20, 15), lamp(31, 7),
+        { art: 'bench', x: 18, y: 11, w: 2, h: 1 }, { art: 'bench', x: 25, y: 11, w: 2, h: 1 },
+        { art: 'plant', x: 16, y: 9, w: 1, h: 1 }, { art: 'plant', x: 29, y: 9, w: 1, h: 1 }, { art: 'plant', x: 22, y: 13, w: 1, h: 1 },
+        { art: 'palm', x: 23, y: 10, w: 1, h: 1, ox: -8, hit: [5, 9, 6, 7] }
+      ],
+      areas: [
+        { x: 4, y: 10, w: 10, h: 4, name: 'Minha casa', sub: 'Beira da praia na Ribeira', onEnter: function () { AF.Audio.play('house_door'); } },
+        { x: 0, y: 15, w: 32, h: 9, name: 'Orla da Ribeira', sub: 'Saveiros, sorvete e o pôr do sol na Enseada dos Tainheiros' },
+        { x: 0, y: 0, w: 32, h: 15, quiet: true }
+      ],
+      npcs: [
+        { id: 'didi', spec: 'didi', x: 27.5, y: 17.9, dir: 'down', interact: 'didi', label: 'Seu Didi (pescador)' }
+      ],
+      portals: [],
+      spawns: {
+        vlt: { x: 24.5, y: 7.9, dir: 'down' },
+        cama: { x: 6.5, y: 12.4, dir: 'down' }
       }
     },
 

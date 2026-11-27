@@ -36,13 +36,13 @@
           var L = def.legend[this.tiles[y][x]] || { tile: 'floor' };
           this.solid[y].push(!!L.solid);
           var key = L.tile;
-          if (key === 'wall' || key === 'shield') {
+          if (key === 'wall' || key === 'shield' || key === 'casa') {
             var below = this.tiles[y + 1] && def.legend[this.tiles[y + 1][x]];
             var bt = below && below.tile;
-            key = key + ((below && bt !== 'wall' && bt !== 'shield' && !below.field) ? '_face' : '_top');
+            key = key + ((below && bt !== 'wall' && bt !== 'shield' && bt !== 'casa' && !below.field) ? '_face' : '_top');
           }
           var nv = AF.Tiles.variants(key) || 1;
-          this.keys[y].push({ key: key, v: AF.Pix.hash(x, y) % nv, anim: !!L.anim, hazard: !!L.hazard, field: !!L.field });
+          this.keys[y].push({ key: key, v: L.v !== undefined && key.slice(-5) === '_face' ? L.v % nv : AF.Pix.hash(x, y) % nv, anim: !!L.anim, hazard: !!L.hazard, field: !!L.field });
         }
       }
       /* objetos */
@@ -69,11 +69,12 @@
       /* NPCs */
       this.npcs = (def.npcs || []).filter(function (nd) { return !nd.cond || nd.cond(); }).map(function (nd) {
         return { d: nd, id: nd.id, kind: nd.kind || 'char', x: nd.x * T, y: nd.y * T, dir: nd.dir, home: nd.dir,
-                 frames: nd.spec ? frames(nd.spec) : null, turnT: 2 + Math.random() * 4, talkT: 0 };
+                 frames: nd.spec ? frames(nd.spec) : null, turnT: 2 + Math.random() * 4, talkT: 0,
+                 vx: nd.speed || 0, ph: Math.random() * 6 };
       });
       /* jogador */
       if (!this.titleMode) {
-        this.playerFrames = AF.Chars.build(AF.Chars.playerSpec(S.d.look));
+        this.playerFrames = AF.Chars.build(S.spec());
         var sp = typeof spawn === 'string' ? def.spawns[spawn] : spawn;
         sp = sp || def.spawns.start || def.spawns.entrada;
         this.player = {
@@ -84,8 +85,26 @@
       } else this.player = null;
       this.particles = [];
       this.target = null;
+      this.stepT = 0;
+      this.buoys = {};
       this.area = this.player ? this.areaAt(this.player.x, this.player.y) : null;
       this.snapCamera();
+    },
+
+    /* Atualiza o visual do jogador (roupa nova, traje de banho) */
+    refreshPlayer: function () { if (S.d && !this.titleMode) this.playerFrames = AF.Chars.build(S.spec()); },
+
+    /* Água em que se pode nadar (aula de natação da Prainha) */
+    inSwimZone: function (tx, ty) {
+      var z = this.def.swimZone;
+      return !!(z && tx >= z.x && tx < z.x + z.w && ty >= z.y && ty < z.y + z.h);
+    },
+    swimming: function () {
+      var p = this.player;
+      if (!p || !S.d || !S.d.swim) return false;
+      var tx = Math.floor(p.x / T), ty = Math.floor((p.y - 2) / T);
+      var k = this.keys[ty] && this.keys[ty][tx];
+      return !!(k && (k.key === 'water' || k.key === 'foam') && this.inSwimZone(tx, ty));
     },
 
     /* Sub-regiões do mapa (ex.: Prainha da Baía): faixa de título ao entrar */
@@ -101,6 +120,7 @@
       var a = this.areaAt(this.player.x, this.player.y);
       if (a === this.area) return;
       this.area = a;
+      if (S.d && S.d.swim && !(a && a.name === 'Prainha da Baía') && AF.Swim) AF.Swim.stop(true);
       if (!a || !a.name) return;
       AF.HUD.banner(a.name, a.sub);
       if (a.onEnter) a.onEnter();
@@ -110,6 +130,7 @@
     isSolidTile: function (tx, ty) {
       if (tx < 0 || ty < 0 || tx >= this.w || ty >= this.h) return true;
       if (this.keys[ty][tx].field) return !(S.flag('tableDone') && S.flag('protocolo'));   /* porta interna da sala blindada */
+      if (S.d && S.d.swim && this.inSwimZone(tx, ty)) { var kk = this.keys[ty][tx].key; if (kk === 'water' || kk === 'foam') return false; }
       return this.solid[ty][tx];
     },
     rectHits: function (r) {
@@ -119,6 +140,7 @@
       for (var i = 0; i < this.colliders.length; i++) if (overlap(r, this.colliders[i])) return true;
       for (var k = 0; k < this.npcs.length; k++) {
         var n = this.npcs[k];
+        if (n.kind === 'swimmer') continue;
         if (overlap(r, [n.x - 6, n.y - 5, n.x + 6, n.y + 1])) return true;
       }
       return false;
@@ -144,7 +166,7 @@
           if (Math.abs(dx) < 0.2) dx = 0; if (Math.abs(dy) < 0.2) dy = 0;
         }
         if (dx || dy) {
-          var len = Math.hypot(dx, dy), sp = C.PLAYER_SPEED * dt * mag;
+          var len = Math.hypot(dx, dy), sp = C.PLAYER_SPEED * dt * mag * (this.swimming() ? 0.62 : 1);
           var mx = dx / len * sp, my = dy / len * sp;
           if (I.axis && dx && dy) p.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
           else if (dx && !dy) p.dir = dx > 0 ? 'right' : 'left';
@@ -163,7 +185,37 @@
         this.target = null;
       }
       p.anim = p.moving ? p.anim + dt : 0;
+      if (p.moving) {
+        this.stepT -= dt;
+        if (this.stepT <= 0) { var sw = this.swimming(); this.stepT = sw ? 0.5 : 0.27; AF.Audio.step(sw ? 'agua' : this.surface()); }
+      } else this.stepT = 0.06;
+      if (S.d && S.d.swim) this.checkBuoys();
       this.followCamera(dt);
+    },
+
+    /* tipo de chão sob o jogador, para o som dos passos */
+    surface: function () {
+      var p = this.player, tx = Math.floor(p.x / T), ty = Math.floor((p.y - 2) / T);
+      var k = this.keys[ty] && this.keys[ty][tx], key = k ? k.key : 'floor';
+      if (key === 'sand') return 'areia';
+      if (key === 'wood' || key === 'ponte' || key === 'stairs' || key === 'piso_casa') return 'madeira';
+      if (key === 'grama' || key === 'terra' || key === 'trilha') return 'terra';
+      if (key === 'lab' || key === 'iso' || key === 'floor' || key === 'porta' || key === 'exit' || key === 'ruido') return 'metal';
+      return 'pedra';
+    },
+    checkBuoys: function () {
+      var p = this.player, self = this;
+      this.props.forEach(function (pr) {
+        var b = pr.d.buoy;
+        if (!b || self.buoys[b]) return;
+        var bx = pr.x * T + 8, by = pr.y * T + 12;
+        if (Math.hypot(p.x - bx, p.y - by) < 13) {
+          self.buoys[b] = true;
+          var n = Object.keys(self.buoys).length;
+          AF.Audio.play('splash');
+          if (AF.Swim) AF.Swim.buoy(n);
+        }
+      });
     },
 
     checkHazards: function (dt) {
@@ -231,6 +283,13 @@
         if (n.kind === 'drone') {
           var tx = (S.d && S.flag('gateOpen') ? 35.4 : 31.9) * T;
           n.x += (tx - n.x) * Math.min(1, dt * 2);
+          return;
+        }
+        if (n.kind === 'swimmer') {
+          n.ph += dt;
+          n.x += n.vx * dt;
+          if (n.x < n.d.x0 * T) { n.x = n.d.x0 * T; n.vx = Math.abs(n.vx); }
+          if (n.x > n.d.x1 * T) { n.x = n.d.x1 * T; n.vx = -Math.abs(n.vx); }
           return;
         }
         if (n.talkT > 0) { n.talkT -= dt; if (n.talkT <= 0 && !AF.Dialogue.active) n.dir = n.home; return; }
@@ -395,17 +454,39 @@
         ctx.drawImage(img, x - 8, y - 24 + bob);
         return;
       }
+      if (n.kind === 'swimmer') { this.drawSwimmer(ctx, x, y, n); return; }
       this.drawShadow(ctx, x, y, 10);
       var f = n.frames[n.dir][0];
       ctx.drawImage(f, x - 8, y - 21);
     },
 
+    /* aluno(a) da aula de natação: touca, braçada e espuma */
+    drawSwimmer: function (ctx, x, y, n) {
+      var dir = n.vx >= 0 ? 1 : -1, ph = n.ph * 5, stroke = Math.sin(ph);
+      ctx.fillStyle = 'rgba(232,246,255,0.55)';
+      ctx.fillRect(x - 7 - dir * 3, y - 3, 12, 1); ctx.fillRect(x - 5 - dir * 6, y - 2, 6, 1);
+      ctx.fillStyle = n.d.skin || '#4a2a1c'; ctx.fillRect(x - 2, y - 7, 5, 4);
+      ctx.fillStyle = n.d.cap || '#ffc940'; ctx.fillRect(x - 2, y - 8, 5, 2); ctx.fillRect(x - 1, y - 9, 3, 1);
+      ctx.fillStyle = '#3aa0ff'; ctx.fillRect(x + (dir > 0 ? 1 : -2), y - 6, 2, 1);
+      var ax = x + dir * (stroke > 0 ? 4 : -3), ay = y - (stroke > 0 ? 8 + Math.round(stroke * 2) : 4);
+      ctx.fillStyle = n.d.skin || '#4a2a1c'; ctx.fillRect(ax, ay, 2, stroke > 0 ? 3 : 2);
+      if (stroke < -0.6) { ctx.fillStyle = 'rgba(232,246,255,0.8)'; ctx.fillRect(x + dir * 5, y - 4, 2, 1); }
+    },
+
     drawPlayer: function (ctx, cx, cy) {
       var p = this.player;
       var x = Math.round(p.x - cx), y = Math.round(p.y - cy);
-      this.drawShadow(ctx, x, y, 10);
       var seq = [1, 0, 2, 0];
       var fi = p.moving ? seq[Math.floor(p.anim * 8) % 4] : 0;
+      if (this.swimming()) {                              /* nadando: só cabeça e ombros fora d'água */
+        var bob = Math.round(Math.sin(this.t * 4) * 1);
+        ctx.drawImage(this.playerFrames[p.dir][0], 0, 0, 16, 13, x - 8, y - 13 + bob, 16, 13);
+        ctx.fillStyle = 'rgba(232,246,255,0.6)';
+        ctx.fillRect(x - 8, y - 1 + bob, 16, 1);
+        if (p.moving) { ctx.fillRect(x - 10 + (Math.floor(this.t * 6) % 3), y + bob, 4, 1); ctx.fillRect(x + 6 - (Math.floor(this.t * 6) % 3), y + bob, 4, 1); }
+        return;
+      }
+      this.drawShadow(ctx, x, y, 10);
       ctx.drawImage(this.playerFrames[p.dir][fi], x - 8, y - 21);
     },
 

@@ -113,7 +113,10 @@
     loop: function (t) {
       var dt = Math.min(0.05, (t - this.last) / 1000);
       this.last = t;
-      if (this.mode === 'play' && S.d) {
+      if (this.mode === 'trip') {
+        AF.Trip.update(dt);
+        S.d.stats.playTime += dt;
+      } else if (this.mode === 'play' && S.d) {
         var block = AF.UI.blocking();
         AF.World.update(dt, !block);
         AF.Dialogue.update(dt);
@@ -134,7 +137,8 @@
       }
       AF.Touch.update();
       AF.Music.update();
-      AF.World.render(this.ctx);
+      if (this.mode === 'trip') AF.Trip.render(this.ctx);
+      else AF.World.render(this.ctx);
       AF.HUD.updatePrompt();
       AF.Input.endFrame();
       requestAnimationFrame(function (tt) { G.loop(tt); });
@@ -176,6 +180,12 @@
       /* jogos salvos antes da sala blindada: quem já estava lá dentro não fica preso */
       if (map === 'torre' && S.flag('tableDone') && !S.flag('protocolo') && S.d.y < 7 * AF.CONFIG.TILE) S.setFlag('protocolo');
       AF.World.load(map, { px: S.d.x, py: S.d.y, dir: S.d.dir });
+      var W = AF.World, pl = W.player;
+      if (W.rectHits(W.playerRect(pl.x, pl.y))) {                  /* salvo nadando: volta para a areia */
+        var sp = W.def.spawns.natacao || W.def.spawns.start || W.def.spawns.entrada || W.def.spawns.vlt;
+        if (sp) { pl.x = sp.x * AF.CONFIG.TILE; pl.y = sp.y * AF.CONFIG.TILE; W.snapCamera(); }
+      }
+      AF.NucleoWait.resume();
       AF.HUD.show(true); AF.HUD.refresh();
       AF.HUD.banner(AF.MAPS[map].name, 'Missão retomada · ' + AF.MAPS[map].sub);
       AF.Input.clear();
@@ -197,19 +207,29 @@
     objective: function () {
       if (!S.d) return { act: '', text: '' };
       var PI = 'Problematização', OC = 'Organização do Conhecimento', AC = 'Aplicação do Conhecimento';
+      if (S.d.swim) return { act: 'Aula de natação', text: 'Nade até as três boias laranja (' + Object.keys(AF.World.buoys || {}).length + '/3). Para sair da água, fale com Mi Ayô ou volte para a praça.' };
       if (S.flag('restored')) {
-        var left = [];
-        if (!S.flag('miniElevador')) left.push('Elevador de Hadamard no Elevador Lacerda (' + Math.min(5, S.count('elevSolved')) + '/5)');
+        var left = [], mapId = AF.World && AF.World.mapId;
+        if (!S.flag('casa')) left.push('descanse em casa, na Ribeira (VLT da Baía, na avenida da praça)');
+        if (!S.flag('miniElevador')) left.push('painel de portas do Elevador Lacerda (' + Math.min(5, S.count('elevSolved')) + '/5)');
         if (!S.flag('miniMercado')) left.push('Gincana das Fitinhas no Mercado Modelo');
         if (!S.flag('hohenfeldStory')) left.push('conte a aventura ao Prof. Hohenfeld na Prainha (Rampa do Mercado)');
         if (!S.flag('jacobinaDone')) left.push(S.flag('jacobina') ? 'opere a Recepção no console de Jamal, em Jacobina' : 'visite Jamal em Jacobina (Hipertrem, leste da praça)');
-        var out = AF.World && AF.World.mapId === 'torre' ? 'Saia da Torre. ' : '';
-        if (AF.World && AF.World.mapId === 'jacobina' && S.flag('jacobinaDone')) out = 'Volte a Salvador pelo Hipertrem. ';
-        if (!left.length) return { act: 'Missão cumprida', text: 'Tudo concluído! Explore Salvador e conte essa história a quem encontrar.' };
-        return { act: 'Desafios liberados', text: out + 'Agora: ' + left.join(' · ') + '.' };
+        if (!S.flag('natacao')) left.push('aula de natação com Mi Ayô, na Prainha');
+        if (!S.flag('memoria')) left.push('Jogo da Memória Quântico com Kauã');
+        if (!S.flag('mulheresCiencia')) left.push('histórias de mulheres na ciência com o Prof. Hohenfeld');
+        if (S.flag('jacobina') && !S.flag('cruzeiroVista')) left.push('mirante do Alto do Cruzeiro, em Jacobina (20 CQ)');
+        var out = mapId === 'torre' ? 'Saia da Torre. ' : '';
+        if (mapId === 'jacobina' && S.flag('jacobinaDone') && S.flag('cruzeiroVista')) out = 'Volte a Salvador pelo Hipertrem. ';
+        if (mapId === 'ribeira' && S.flag('casa')) out = 'Para voltar ao Comércio, pegue o VLT. ';
+        if (!left.length) return { act: 'Missão cumprida', text: out + 'Tudo concluído! Explore Salvador, troque de visual na Boutique do Mercado e conte essa história a quem encontrar.' };
+        return { act: 'Desafios liberados', text: out + 'Agora: ' + left.slice(0, 3).join(' · ') + (left.length > 3 ? ' · e mais ' + (left.length - 3) : '') + '.' };
       }
-      if (!S.flag('acarajeQ') && !S.flag('gateOpen')) return { act: 'Ato 1 · ' + PI, text: 'Passe no tabuleiro de Dona Cici (sul da praça): tem ou não tem pimenta? Depois, siga para a Torre (leste).' };
-      if (!S.flag('gateOpen')) return { act: 'Ato 1 · ' + PI, text: 'Chegue à Torre da Afrotech (leste da praça) e passe pelo bloqueio de emergência.' };
+      if (!S.flag('acarajeQ') && !S.flag('gateOpen')) return { act: 'Ato 1 · ' + PI, text: 'Passe no tabuleiro de Dona Cici (sul da praça): tem ou não tem pimenta? Depois, o Elevador Lacerda e a Torre (leste).' };
+      if (!S.flag('miniElevador') && !S.flag('gateOpen')) return { act: 'Ato 1 · ' + PI, text: S.flag('portasClassicas')
+        ? 'No Elevador Lacerda (norte da praça), conclua o Elevador de Hadamard: portas quânticas X, H e Z (' + Math.min(5, S.count('elevSolved')) + '/5).'
+        : 'Vá ao Elevador Lacerda (norte da praça) e tire a Credencial de Operador(a) de Portas: primeiro as portas lógicas clássicas, depois as quânticas.' };
+      if (!S.flag('gateOpen')) return { act: 'Ato 1 · ' + PI, text: 'Credencial na mão! Chegue à Torre da Afrotech (leste da praça) e passe pelo bloqueio de emergência.' };
       if (!S.flag('visitedTower')) return { act: 'Ato 1 · ' + PI, text: 'Entre na Torre da Afrotech pelo portão liberado.' };
       if (!S.flag('nucleoLogs') && !S.flag('metDandara')) return { act: 'Ato 2 · ' + PI, text: 'Atravesse o Labirinto do Silêncio e conecte-se à interface do Núcleo, na antecâmara da sala blindada (norte), antes que os logs se apaguem.' };
       if (!S.flag('metDandara')) return { act: 'Ato 2 · ' + PI, text: 'Encontre Dandara no gabinete (oeste do corredor).' };
@@ -220,17 +240,28 @@
       if (!S.flag('codeDecoded')) return { act: 'Ato 3 · ' + OC, text: 'Mostre sua tabela à Prof.ª Iasmin e decifre o código.' };
       if (!S.flag('circuitBuilt') && !S.flag('protocolo')) return { act: 'Ato 4 · ' + AC, text: 'Vá à antecâmara da Sala do Computador Quântico (norte do corredor) e cumpra o protocolo de entrada no painel de acesso.' };
       if (!S.flag('circuitBuilt')) return { act: 'Ato 4 · ' + AC, text: 'Entre na Sala do Computador Quântico e reconstrua o circuito de 3 qubits no Núcleo.' };
-      if (!S.flag('validated')) return { act: 'Ato 4 · ' + AC, text: 'No Núcleo: valide o protocolo ao vivo (5 teletransportes perfeitos).' };
-      return { act: 'Ato 4 · ' + AC, text: 'No Núcleo: registre o Relatório de Consultoria Afrotech.' };
+      if (!AF.NucleoWait.ready()) return { act: 'Ato 4 · ' + AC, text: 'Núcleo recalibrando os qubits: ' + AF.NucleoWait.fmt(AF.NucleoWait.remaining()) + ' para a ' + (S.flag('validated') ? 'Etapa 3 (Relatório)' : 'Etapa 2 (validação ao vivo)') + '. Enquanto isso, explore o laboratório.' };
+      if (!S.flag('validated')) return { act: 'Ato 4 · ' + AC, text: 'No Núcleo: Etapa 2, valide o protocolo ao vivo (5 teletransportes perfeitos).' };
+      return { act: 'Ato 4 · ' + AC, text: 'No Núcleo: Etapa 3, registre o Relatório de Consultoria Afrotech.' };
     },
     act: function () { return this.objective().act; },
 
     transition: function (to, spawn) {
       if (this.transitioning) return;
       this.transitioning = true;
-      AF.Audio.play('door');
+      AF.Audio.play('door_open');
       AF.FX.fade(true, 260);
       setTimeout(function () {
+        G.arrive(to, spawn);
+        AF.Audio.play('door_close');
+      }, 300);
+    },
+
+    /* chega a um mapa (depois de uma porta ou de uma viagem) */
+    arrive: function (to, spawn) {
+      this.transitioning = true;
+      if (S.d.swim) { S.d.swim = null; }
+      (function () {
         AF.World.load(to, spawn);
         if (to === 'jacobina' && !S.flag('jacobina')) {
           S.setFlag('jacobina');
@@ -249,7 +280,7 @@
         AF.Input.clear();
         S.save();
         G.transitioning = false;
-      }, 300);
+      })();
     },
 
     /* Estabilidade zerada: decoerência (sem game over) */
@@ -301,10 +332,11 @@
         '<div class="end-jamal"><canvas width="16" height="16"></canvas><div><b>Jamal (Jacobina):</b> "Recebi! Estado da D-7 com fidelidade de 100%. A cápsula nem saiu de Salvador — só a informação viajou. Jacobina online!"</div></div>' +
         '<h3 class="end-h">Suas hipóteses · antes e depois</h3><div class="hyps">' + hyp + '</div>' +
         '<h3 class="end-h">Novos desafios liberados em Salvador</h3>' +
-        '<ul class="end-tasks"><li><b>Elevador Lacerda · Elevador de Hadamard:</b> a Cidade Baixa é |0⟩ e a Cidade Alta é |1⟩. Use X, H e Z para levar os passageiros — e descubra a interferência.</li>' +
-        '<li><b>Mercado Modelo · Gincana das Fitinhas:</b> com Dona Zeza e Jamal, vença o desafio de Bell acima do teto clássico de 75%.</li>' +
-        '<li><b>Prainha da Baía:</b> desça a Rampa do Mercado e conte sua aventura ao Prof. Hohenfeld.</li>' +
-        '<li><b>Jacobina:</b> pegue o Hipertrem (leste da praça) até a Estação Receptora e receba as próximas cápsulas pelo lado de Jamal.</li></ul>' +
+        '<ul class="end-tasks"><li><b>Casa na Ribeira:</b> pegue o VLT da Baía na avenida da praça e veja o caminho até a beira da praia. Durma, troque de roupa e tome um sorvete na orla.</li>' +
+        '<li><b>Mercado Modelo:</b> a Gincana das Fitinhas de Dona Zeza (o desafio de Bell) e a Boutique da Dona Lu, com roupas e acessórios pagos em Créditos Quânticos.</li>' +
+        '<li><b>Prainha da Baía:</b> histórias da mecânica quântica e de mulheres na ciência com o Prof. Hohenfeld, e a aula de natação de Mi Ayô.</li>' +
+        '<li><b>Jacobina:</b> pegue o Hipertrem (leste da praça), receba as próximas cápsulas pelo lado de Jamal e suba ao mirante do Alto do Cruzeiro.</li>' +
+        '<li><b>Kauã:</b> o Jogo da Memória Quântico, no centro da praça.</li></ul>' +
         '<h3 class="end-h">Missão para a turma (fora do jogo)</h3>' +
         '<ul class="end-tasks"><li><b>IBM Quantum Composer:</b> montem o circuito de 3 qubits do teletransporte (H e CNOT para o par; CNOT e H de Dandara; medidas; correções X e Z).</li>' +
         '<li><b>Vídeo de 3 a 5 minutos</b> (relatório de consultoria): explicação científica, momento crítico (medição e colapso), justificativa técnica e visão de futuro para Salvador.</li></ul>' +
@@ -318,10 +350,11 @@
         '</div>' +
         '<p class="dim">Fim do Volume 2 · +20 CQ de recompensa. Tudo fica registrado no Diário de Bordo.</p>' +
         '<div class="end-rep"><b>Para a sua professora ou professor:</b> gere o relatório da sua missão (hipóteses, respostas e simulador) e envie o código.</div>' +
-        '<div class="btn-row"><button class="btn primary" id="end-stay">Continuar explorando</button><button class="btn" id="end-rep">Relatório para a professora</button><button class="btn" id="end-title">Voltar ao título</button></div>';
+        '<div class="btn-row"><button class="btn primary" id="end-home">Ir para casa descansar (VLT)</button><button class="btn" id="end-stay">Continuar explorando</button><button class="btn" id="end-rep">Relatório para a professora</button><button class="btn" id="end-title">Voltar ao título</button></div>';
       var m = AF.UI.modal({ title: 'MISSÃO CUMPRIDA', body: body, cls: 'modal-md', closable: false });
       var pc = body.querySelector('canvas').getContext('2d'); pc.imageSmoothingEnabled = false; pc.drawImage(jp, 0, 0);
       body.querySelector('#end-stay').addEventListener('click', function () { m.close(); AF.HUD.refresh(); });
+      body.querySelector('#end-home').addEventListener('click', function () { m.close(true); AF.HUD.refresh(); AF.Trip.play('casa'); });
       body.querySelector('#end-title').addEventListener('click', function () { m.close(true); G.toTitle(); });
       body.querySelector('#end-rep').addEventListener('click', function () { AF.Report.open(); });
       AF.Audio.play('victory');

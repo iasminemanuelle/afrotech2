@@ -197,7 +197,7 @@ body.hint-room .hud-bl { display: block; }
 .c-name-row { display: flex; gap: 6px; }
 #c-name { flex: 1; min-width: 0; font-family: var(--font); font-size: 26px; background: #0e0b24; color: var(--text); border: 2px solid var(--line); padding: 2px 8px; }
 #c-name:focus { outline: none; border-color: var(--cyan); }
-.swatches { display: flex; gap: 8px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; }
 .swatch { width: 34px; height: 28px; border: 2px solid #04030a; box-shadow: 0 0 0 2px var(--line); cursor: pointer; }
 .swatch.on { box-shadow: 0 0 0 2px var(--cyan), 0 0 10px var(--cyan); }
 .opts { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -575,3 +575,60 @@ kbd { display: inline-block; font-family: var(--font); font-size: 21px; backgrou
 .mg-scene .blo-cv { width: 70%; max-width: 240px; border-color: #221d4a; }
 .jac-gates { grid-template-columns: 1fr 1fr; margin-top: 0; }
 .jac-bits { font-size: 1.2em; }
+
+/* ---------- Ficha: aparência com abas (v0.8) ---------- */
+.c-look-tabs { display: flex; gap: 4px; margin-top: 10px; }
+.c-look-tabs button { flex: 1; font: inherit; font-size: 19px; background: #120e30; color: var(--dim); border: 2px solid #2c2660; padding: 2px 4px; cursor: pointer; }
+.c-look-tabs button.on { color: var(--gold); border-color: var(--gold); background: #1c1640; }
+.c-look { border: 2px solid #2c2660; border-top: none; padding: 2px 8px 8px; background: rgba(14,11,36,0.6); }
+.c-look .c-label { margin: 8px 0 3px; }
+.c-look .swatch { width: 26px; height: 22px; }
+.c-look .opt.multi.on::before { content: '✓ '; }
+.c-look-rand { margin-top: 8px; width: 100%; }
+
+/* ---------- Boutique do Mercado e guarda-roupa ---------- */
+.shop { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 14px; }
+.shop-prev { background: radial-gradient(circle, #2a2060, #0e0b24); border: 2px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 6px; gap: 6px; align-self: start; position: sticky; top: 0; }
+.shop-prev canvas { width: 96px; height: 132px; image-rendering: pixelated; }
+.shop-prev .cq { font-size: 22px; }
+.shop-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.shop-tabs button { font: inherit; font-size: 19px; background: #120e30; color: var(--dim); border: 2px solid #2c2660; padding: 1px 8px; cursor: pointer; }
+.shop-tabs button.on { color: var(--cyan); border-color: var(--cyan); }
+.shop-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; max-height: min(52vh, 520px); overflow-y: auto; padding-right: 4px; }
+.shop-item { border: 2px solid #2c2660; background: #120e2e; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+.shop-item.on { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,229,255,0.35); }
+.shop-item .si-head { display: flex; justify-content: space-between; gap: 6px; }
+.shop-item .si-name { color: var(--text); font-size: 21px; line-height: 1; }
+.shop-item .si-price { color: var(--gold); white-space: nowrap; }
+.shop-item .si-desc { color: var(--dim); font-size: 17px; line-height: 1.05; }
+.shop-item .si-tag { font-size: 16px; color: var(--green); }
+.shop-foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.shop-foot .msg { flex: 1; min-width: 160px; color: var(--dim); font-size: 19px; }
+@media (max-width: 640px) { .shop { grid-template-columns: 1fr; } .shop-prev { flex-direction: row; position: static; } .shop-prev canvas { width: 64px; height: 88px; } .shop-list { max-height: 40vh; } }
+
+/* ---------- Cena de viagem (VLT / Hipertrem) ---------- */
+#trip-ui { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; pointer-events: none; z-index: 6; }
+#trip-ui.hidden { display: none; }
+#trip-ui .trip-cap { max-width: min(92%, 760px); background: rgba(7,6,20,0.82); border: 2px solid var(--line); padding: 6px 12px; color: var(--text); font-size: 21px; line-height: 1.1; text-align: center; }
+#trip-ui .trip-cap b { color: var(--gold); display: block; font-size: 23px; }
+#trip-skip { position: absolute; right: 10px; top: 8px; pointer-events: auto; }
+
+/* ---------- Mirante do Cruzeiro, Núcleo e memória ---------- */
+.pano canvas { width: 100%; image-rendering: pixelated; border: 2px solid var(--line); display: block; }
+.pano p { margin: 8px 0 0; }
+.nuc-wait { text-align: center; }
+.nuc-wait .clock { font-size: 54px; color: var(--cyan); text-shadow: 0 0 12px rgba(0,229,255,0.6); line-height: 1; margin: 6px 0; }
+.nuc-wait .bar { height: 12px; background: #120e30; border: 2px solid #2c2660; margin: 6px 0 10px; }
+.nuc-wait .bar i { display: block; height: 100%; background: linear-gradient(90deg, #0089a8, #00e5ff); }
+.nuc-wait .fact { min-height: 64px; color: var(--text); font-size: 20px; }
+.mem-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.mem-card { height: 78px; border: 2px solid #2c2660; background: repeating-linear-gradient(45deg, #1a1446, #1a1446 6px, #140f38 6px, #140f38 12px); color: #7af9ff; font: inherit; font-size: 18px; line-height: 1.05; cursor: pointer; padding: 3px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.mem-card.up { background: #0e1a34; border-color: var(--cyan); color: var(--text); }
+.mem-card.ok { background: #0e2a20; border-color: var(--green); color: var(--green); cursor: default; }
+.mem-card.ent { box-shadow: 0 0 10px rgba(255,63,164,0.8); }
+.mem-card .ket { font-size: 26px; color: var(--gold); }
+.mem-stat { display: flex; justify-content: space-between; margin: 6px 0; color: var(--dim); }
+.logic-tab { border-collapse: collapse; margin: 6px 0; font-size: 21px; }
+.logic-tab td, .logic-tab th { border: 1px solid #2c2660; padding: 1px 10px; text-align: center; }
+.logic-tab th { color: var(--gold); font-weight: normal; }
+.logic-tab .ok { color: var(--green); } .logic-tab .bad { color: var(--red, #ff4d6a); }
