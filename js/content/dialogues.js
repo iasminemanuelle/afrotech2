@@ -454,7 +454,8 @@
           : 'Sua cama. Lençol cheirando a sol, a janela aberta para a Enseada dos Tainheiros e o barulho baixinho das ondas. Depois de salvar o Canal Quântico, você merece.';
       },
         choices: [
-          { t: 'Descansar até amanhã', close: true, action: function () { AF.Home.rest(); } },
+          { t: 'Dormir até amanhã', close: true, action: function () { AF.Home.rest(); } },
+          { t: 'Dormir e ver os créditos de novo', if: function () { return S.flag('creditsSeen'); }, close: true, action: function () { AF.Home.sleep(true); } },
           { t: 'Ainda não.', close: true }
         ] }
     } },

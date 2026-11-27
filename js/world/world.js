@@ -87,8 +87,22 @@
       this.target = null;
       this.stepT = 0;
       this.buoys = {};
+      this.auto = null; this.sleeping = null; this.night = 0;
       this.area = this.player ? this.areaAt(this.player.x, this.player.y) : null;
       this.snapCamera();
+    },
+
+    /* Caminhada automática por pontos (cenas: ir para a cama) */
+    walkTo: function (pts, onDone) { this.auto = { pts: pts, i: 0, onDone: onDone }; this.target = null; },
+    autoWalk: function (dt) {
+      var a = this.auto, p = this.player, pt = a.pts[a.i];
+      if (!pt) { this.auto = null; if (a.onDone) a.onDone(); return; }
+      var tx = pt[0] * T, ty = pt[1] * T, dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy), sp = C.PLAYER_SPEED * 0.9 * dt;
+      if (d <= sp) { p.x = tx; p.y = ty; a.i++; }
+      else { p.x += dx / d * sp; p.y += dy / d * sp; }
+      p.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+      p.moving = true;
+      this.checkArea();
     },
 
     /* Atualiza o visual do jogador (roupa nova, traje de banho) */
@@ -156,6 +170,8 @@
       if (this.titleMode) { this.titleCamera(); return; }
       var p = this.player, I = AF.Input;
       p.moving = false;
+      if (this.auto) { this.autoWalk(dt); allowInput = false; }
+      if (this.sleeping) allowInput = false;
       if (allowInput) {
         var dx = (I.down.right ? 1 : 0) - (I.down.left ? 1 : 0);
         var dy = (I.down.down ? 1 : 0) - (I.down.up ? 1 : 0);
@@ -409,6 +425,9 @@
       ctx.globalAlpha = 1;
       ctx.restore();
 
+      /* noite caindo (cena de dormir) */
+      if (this.night > 0) { ctx.fillStyle = 'rgba(4,4,22,' + (0.72 * this.night).toFixed(3) + ')'; ctx.fillRect(0, 0, cw, ch); }
+
       /* pós-processamento de ruído quântico */
       if (AF.FX.glitch > 0) {
         var gI = AF.FX.glitch;
@@ -478,6 +497,7 @@
       var x = Math.round(p.x - cx), y = Math.round(p.y - cy);
       var seq = [1, 0, 2, 0];
       var fi = p.moving ? seq[Math.floor(p.anim * 8) % 4] : 0;
+      if (this.sleeping) { this.drawSleeping(ctx, cx, cy); return; }
       if (this.swimming()) {                              /* nadando: só cabeça e ombros fora d'água */
         var bob = Math.round(Math.sin(this.t * 4) * 1);
         ctx.drawImage(this.playerFrames[p.dir][0], 0, 0, 16, 13, x - 8, y - 13 + bob, 16, 13);
@@ -488,6 +508,24 @@
       }
       this.drawShadow(ctx, x, y, 10);
       ctx.drawImage(this.playerFrames[p.dir][fi], x - 8, y - 21);
+    },
+
+    /* deitado(a) na cama, com o cobertor e os "Z" subindo */
+    drawSleeping: function (ctx, cx, cy) {
+      var s = this.sleeping, bx = Math.round(s.x - cx), by = Math.round(s.y - cy);
+      ctx.save(); ctx.translate(bx + 2, by + 20); ctx.rotate(-Math.PI / 2);
+      ctx.drawImage(this.playerFrames.down[0], 0, 0);
+      ctx.restore();
+      ctx.fillStyle = '#3a9ab0'; ctx.fillRect(bx + 11, by + 9, 18, 11);
+      ctx.fillStyle = '#2a7a90'; ctx.fillRect(bx + 11, by + 9, 18, 1);
+      ctx.fillStyle = '#ffc940'; for (var k = 0; k < 4; k++) ctx.fillRect(bx + 13 + k * 4, by + 14, 1, 1);
+      var t = this.t;
+      for (var z = 0; z < 3; z++) {
+        var ph = (t * 0.6 + z / 3) % 1;
+        ctx.globalAlpha = 1 - ph;
+        AF.Pix.text(ctx, 'Z', Math.round(bx + 6 + ph * 10 + z * 2), Math.round(by - 2 - ph * 18), '#e8e6ff');
+      }
+      ctx.globalAlpha = 1;
     },
 
     renderLights: function (ctx, cx, cy, t) {

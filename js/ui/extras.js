@@ -158,23 +158,62 @@
     }
   };
 
-  /* ---------------- Casa na Ribeira ---------------- */
-  AF.Home = {
-    rest: function () {
+  /* ---------------- Casa na Ribeira: dormir (e os créditos finais) ---------------- */
+  var BED = { x: 4 * 16, y: 11 * 16 - 24 };              /* canto da cama na tela do mapa */
+  var Home = AF.Home = {
+    busy: false,
+    /* primeira chegada depois da missão: o(a) agente entra em casa e vai dormir; sobem os créditos */
+    endSequence: function () {
+      if (this.busy || AF.World.mapId !== 'ribeira') return;
+      this.busy = true;
+      AF.Toast.show('Missão cumprida. Hora de descansar, ' + S.d.name + '.', 'gold');
+      AF.World.walkTo([[24.5, 14.6], [16, 14.6], [16, 15.5], [9, 15.5], [9, 12.6], [6.5, 12.4]], function () { Home.sleep(true); });
+    },
+    rest: function () { this.sleep(false); },
+    sleep: function (credits) {
+      var W = AF.World;
+      this.busy = true;
+      if (AF.Dialogue.active) AF.Dialogue.close();
+      W.auto = null;
+      W.player.x = 6.5 * 16; W.player.y = 12.4 * 16; W.player.dir = 'down';
+      W.sleeping = { x: BED.x, y: BED.y };
       AF.Audio.play('snore');
-      AF.FX.fade(true, 500);
+      clearInterval(this._sn);
+      this._sn = setInterval(function () { AF.Audio.play('snore'); }, 2200);
+      var t0 = performance.now(), dur = credits ? 4500 : 3000;
+      (function dim() {
+        var k = Math.min(1, (performance.now() - t0) / dur);
+        W.night = k;
+        if (k < 1) requestAnimationFrame(dim); else after();
+      })();
+      function after() {
+        S.heal(9999); S.inc('noites');
+        if (!S.flag('casa')) {
+          S.setFlag('casa');
+          S.addJournal('Descanso na Ribeira', 'Depois da missão peguei o VLT da Baía até a Ribeira e dormi em casa, na beira da praia. Acordei com o barulho dos saveiros e o cheiro de maresia. Estabilidade restaurada.');
+        }
+        S.save();
+        if (credits) {
+          clearInterval(Home._sn);
+          S.setFlag('creditsSeen');
+          setTimeout(function () { AF.Credits.roll(function () { Home.wake(); }); }, 400);
+        } else setTimeout(function () { Home.wake(); }, 900);
+      }
+    },
+    wake: function () {
+      var W = AF.World;
+      clearInterval(this._sn);
+      AF.FX.fade(true, 300);
       setTimeout(function () {
-        S.heal(9999);
-        var first = !S.flag('casa');
-        S.setFlag('casa');
-        S.inc('noites');
-        if (first) S.addJournal('Descanso na Ribeira', 'Depois da missão peguei o VLT da Baía até a Ribeira e dormi em casa, na beira da praia. Acordei com o barulho dos saveiros e o cheiro de maresia. Estabilidade restaurada.');
-        if (AF.World.player) { AF.World.player.x = 6.5 * 16; AF.World.player.y = 12.4 * 16; AF.World.player.dir = 'down'; AF.World.snapCamera(); }
+        W.sleeping = null; W.night = 0;
+        if (W.player) { W.player.x = 6.5 * 16; W.player.y = 12.4 * 16; W.player.dir = 'down'; W.snapCamera(); }
+        Home.busy = false;
         S.save();
         AF.FX.fade(false, 700);
         AF.HUD.refresh();
+        AF.Audio.play('chime');
         setTimeout(function () { AF.Dialogue.start('casa_acorda'); }, 800);
-      }, 1500);
+      }, 320);
     }
   };
 })(window.AF);

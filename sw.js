@@ -1,7 +1,7 @@
 /* Service worker — deixa o jogo jogável offline depois da 1ª visita
  * (só funciona quando hospedado em http/https: GitHub Pages, Netlify, servidor da escola).
  * Ao publicar uma nova versão, mude CACHE para forçar a atualização. */
-var CACHE = 'afrotech-v2-0.8.1';
+var CACHE = 'afrotech-v2-0.8.2';
 var FILES = [
   './',
   './index.html',
@@ -32,6 +32,7 @@ var FILES = [
   './js/systems/dialogue.js',
   './js/systems/dice.js',
   './js/ui/create.js',
+  './js/ui/credits.js',
   './js/ui/extras.js',
   './js/ui/hud.js',
   './js/ui/lousa.js',

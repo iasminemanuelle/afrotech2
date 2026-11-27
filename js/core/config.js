@@ -17,7 +17,7 @@ window.AF = window.AF || {};
     BASE_STABILITY: 100,
     PLAYER_SPEED: 74,    // px de jogo por segundo
     SAVE_KEY: 'afrotech_v2_save',
-    VERSION: '0.8.1',
+    VERSION: '0.8.2',
     NUCLEO_WAIT: 90      // segundos entre as etapas do protocolo no Núcleo (recalibração)
   };
 

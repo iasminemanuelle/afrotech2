@@ -517,7 +517,7 @@
     desired: function () {
       var G = AF.Game;
       if (G && G.mode === 'trip' && AF.Trip && AF.Trip.music) return AF.Trip.music;
-      if (!G || G.mode !== 'play') return 'titulo';
+      if (!G || G.mode !== 'play' || this._credits) return 'titulo';
       if (this._ending) return 'festa';
       if (this._modal) return 'desafio';
       var W = AF.World, id = W && W.mapId, area = W && W.area && W.area.name;
@@ -532,6 +532,7 @@
       if (!this.on || A.muted) return 0;
       var v = LEVELS[this.level];
       if (AF.Dialogue && AF.Dialogue.active) v *= 0.6;          /* abaixa durante os diálogos */
+      if (AF.World && AF.World.sleeping) v *= 0.4;              /* e quando o(a) agente dorme */
       return v;
     },
 
@@ -542,6 +543,7 @@
         this._chk = 12;
         this._modal = !!document.querySelector('.modal-mini, .modal-sim');
         this._ending = !!document.querySelector('.ending');
+        this._credits = !!document.querySelector('.credits-roll');
       }
       this.bus.gain.setTargetAtTime(this.level01(), now, 0.25);
       var want = this.on ? this.desired() : null;

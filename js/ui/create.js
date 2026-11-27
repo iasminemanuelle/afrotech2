@@ -21,7 +21,10 @@
           '<p>Conteúdos: <b>qubit vs. bit</b>, <b>superposição</b>, <b>medição</b>, <b>emaranhamento</b> e o <b>protocolo de teletransporte quântico</b> com correção por portas X e Z.</p>' +
           '<p>O simulador usa um vetor de estado real de 3 qubits: os bits medidos são sorteados pela regra de Born e a fidelidade é calculada de verdade.</p>' +
           '<p>Narrativa, falas e sequência didática baseadas no produto educacional e na dissertação de <b>Iasmin Emanuelle Santos Silva</b> (MNPEF · Polo 60 · UNEB), com orientação de José Carlos Oliveira de Jesus e coorientação de Marco Antônio Silva Trindade, estruturadas pelos Três Momentos Pedagógicos.</p>' +
-          '<p class="dim">HTML5 + CSS3 + JavaScript puro. Toda a pixel art e os sons são gerados por código. Versão ' + C.VERSION + '.</p></div>' });
+          '<p class="dim">HTML5 + CSS3 + JavaScript puro. Toda a pixel art e os sons são gerados por código. Versão ' + C.VERSION + '.</p>' +
+          '<div class="btn-row"><button class="btn" id="about-credits">Ver os créditos</button></div></div>' });
+        var bc = document.getElementById('about-credits');
+        if (bc) bc.addEventListener('click', function () { AF.UI.closeAll(); AF.Credits.roll(null, { fromTitle: true }); });
       });
     },
     show: function () {

@@ -268,6 +268,9 @@
           S.addJournal('Jacobina, Cidade do Ouro', 'Peguei o Hipertrem até Jacobina, no extremo norte da Chapada Diamantina, a uns 300 km de Salvador. Foi aqui, na Estação Receptora, que Jamal recebeu o estado da D-7. A cidade nasceu da corrida do ouro no período colonial; ao redor, serras, a Mina Velha, o Alto do Cruzeiro e o Rio do Ouro.');
           setTimeout(function () { if (!AF.Dialogue.active) AF.Dialogue.start('jamal_chegada'); }, 1000);
         }
+        if (to === 'ribeira' && S.flag('restored') && !S.flag('creditsSeen')) {
+          setTimeout(function () { if (G.mode === 'play' && !AF.Dialogue.active) AF.Home.endSequence(); }, 900);
+        }
         var firstTower = to === 'torre' && !S.flag('visitedTower');
         if (firstTower) {
           S.setFlag('visitedTower');

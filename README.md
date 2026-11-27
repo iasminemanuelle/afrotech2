@@ -155,6 +155,8 @@ Para entrar na sala no Ato 4, é preciso ter completado a tabela no simulador e 
 | **Aula de natação** | Prainha da Baía, com **Mi Ayô** | Alunos de touca nadam no mar; Mi Ayô convida todo mundo. Quem aceita escolhe o traje (maiô, sunga ou bermuda e camisa de lycra), ganha touca e óculos, entra na água e nada até as três boias. Ao sair da praia, a roupa volta ao normal. |
 | **Jogo da Memória Quântico** | Kauã, no centro da praça | 8 pares (\|0⟩, \|1⟩, X, H, Z, CNOT, medição, decoerência). Carta virada para baixo está em \|?⟩; virar é medir; um par está **emaranhado**: medir uma carta acende a parceira. |
 | **Efeitos sonoros** | Todo o jogo | Passos que mudam com o chão (pedra, areia, madeira, metal, terra, água), "voz" própria de cada personagem nos diálogos e portas que abrem e fecham (pneumáticas na Torre, de madeira em casa, do VLT e do Hipertrem). |
+| **Simulador controlado pelo jogador** (v0.8.1) | Sala de Comando, simulador do teletransporte | O roteiro de operação não roda sozinho: o(a) jogador(a) aplica cada porta (H, CNOT, medições, correções) na ordem, vê as setas de Bloch reduzidas mudarem a cada passo e recebe uma dica se tentar a etapa errada. |
+| **Dormir em casa e créditos finais** (v0.8.2) | Casa na Ribeira, logo ao chegar de VLT depois da missão | O(a) agente desce do VLT, entra em casa sozinho(a) e deita na cama: "Zzz", ronco e a noite caindo. Os **créditos sobem** ao som do tema: o próprio personagem como estrela, o elenco com retratos, roteiro e pedagogia (Iasmin Emanuelle Santos Silva), versão digital, a física do jogo, a trilha baiana, os lugares, as cientistas, as estatísticas da sua missão e um desafio para a turma. Dá para acelerar ou pular. No fim: **"Acordar e continuar explorando"** (amanhece em casa) ou voltar ao título. Os créditos podem ser revistos na cama e no botão **Sobre** do título. O texto fica em `js/ui/credits.js`. |
 
 ### Minigames e a Prainha da Baía (v0.4)
 
@@ -353,6 +355,7 @@ afrotech-vol2/
     │   ├── shop.js         ← Boutique do Mercado (comprar) e guarda-roupa (trocar)
     │   ├── trip.js         ← viagens animadas: VLT até a Ribeira e Hipertrem até Jacobina
     │   ├── extras.js       ← natação, mirante do Cruzeiro, recalibração do Núcleo, descanso em casa
+    │   ├── credits.js      ← créditos finais que sobem depois de dormir em casa
     │   ├── quiz.js         ← motor de perguntas + circuito de 3 qubits desenhado por etapas
     │   ├── lousa.js        ← lousa de Dandara (hipóteses) e Roteiro de Operação
     │   ├── simulator.js    ← Simulador de Teletransporte (treino e desafio final)
